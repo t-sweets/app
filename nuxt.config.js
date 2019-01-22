@@ -29,18 +29,26 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    'element-ui/lib/theme-chalk/index.css'
   ],
 
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/element-ui',
+    '~/plugins/sweet-modal',
   ],
 
   /*
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/dotenv',
+    'nuxt-onsenui-module',
+    ['nuxt-sass-resources-loader', [
+      '@/assets/sass/foundation/mixin.scss'
+    ]],
   ],
 
   router: {
@@ -53,12 +61,23 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    vendor: [
+      'element-ui',
+    ],
     /*
     ** You can extend webpack config here
     */
     extend(config, ctx) {
+      vendor: [
+        'vuex',
+      ]
+      /*
+       ** Build electron 
+       */
       config.output.publicPath = './_nuxt/'
-      config.target = 'electron-renderer'
+      if (process.env.NODE_ENV == 'development') {
+        config.target = 'electron-renderer'
+      }
     }
   }
 }
