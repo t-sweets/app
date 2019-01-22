@@ -1,0 +1,27 @@
+{
+  "name": "sweets-front-app",
+  "version": "1.0.0",
+  "description": "Sweets front application.",
+  "author": "sho",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build": "nuxt build && electron-builder"
+  },
+  "build": {
+    "appId": "sweets front app",
+    "directories": {
+      "output": "build"
+    }
+  },
+  "dependencies": {
+    "cross-env": "^5.2.0",
+    "nuxt": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron": "^3.0.10",
+    "electron-builder": "^20.38.0",
+    "nodemon": "^1.11.0"
+  }
+}
