@@ -4,11 +4,13 @@
     :page-stack="pageStack"
     @push-page="pageStack.push($event)"
     @pop-page="popPage($event)"
+    @resetPosMain="resetPosMain()"
   ></v-ons-navigator>
 </template>
 
 <script>
 import start from "~/pages/startup/index";
+import index from "~/pages/pos/index";
 export default {
   // middleware: ["authenticated"],
   data() {
@@ -20,6 +22,9 @@ export default {
     popPage(event) {
       this.pageStack.unshift(event);
       this.pageStack.splice(1, this.pageStack.length - 1);
+    },
+    resetPosMain() {
+      this.pageStack = [start, index];
     }
   }
 };

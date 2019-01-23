@@ -5,7 +5,7 @@
     </v-ons-toolbar>
 
     <el-row>
-      <el-col :span="10" v-for="menu in menus" :key="menu.id" :offset="0">
+      <el-col :span="12" v-for="menu in menus" :key="menu.id" :offset="0">
         <div @click="menu.openPage">
           <menu-button ref="prod" :menu="menu"/>
         </div>
@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import pos from "~/pages/pos/index.vue";
+import pos from "~/pages/pos/index";
+import charge from "~/pages/charge/index";
 import MenuButton from "~/components/menu/MenuButton";
 
 export default {
@@ -27,9 +28,20 @@ export default {
       menus: [
         {
           title: "商品購入",
-          icon: "",
+          size: "big",
+          icon: ["fas", "cash-register"],
+          description: "Sweetsのお会計画面はこちら",
           openPage: () => {
             this.$emit("push-page", pos);
+          }
+        },
+        {
+          title: "チャージ",
+          size: "big",
+          icon: ["fas", "credit-card"],
+          description: "電子マネーの残高チャージはこちら",
+          openPage: () => {
+            this.$emit("push-page", charge);
           }
         }
       ]

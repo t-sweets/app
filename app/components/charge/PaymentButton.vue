@@ -1,12 +1,9 @@
 <template>
   <el-card :body-style="{ padding: '0px' }">
-    <div class="product-card" :class="menu.size">
+    <div class="product-card">
       <div class="title">
-        <font-awesome-icon class="card-icon" :icon="menu.icon"/>
-        <span>{{ menu.title }}</span>
-      </div>
-      <div class="description">
-        <span>{{ menu.description }}</span>
+        <font-awesome-icon class="card-icon" :icon="method.icon"/>
+        <span>{{ method.charge_title }}</span>
       </div>
     </div>
   </el-card>
@@ -14,7 +11,7 @@
 
 <script>
 export default {
-  props: ["menu"]
+  props: ["method"]
 };
 </script>
 
@@ -23,27 +20,15 @@ export default {
   margin: 10px;
 }
 .product-card {
-  min-height: 200px;
+  height: 200px;
   display: block;
 
   .title {
-    padding: 0 auto;
+    padding-top: 60px;
     font-size: 35px;
     color: #60aefc;
     span {
       margin-left: 15px;
-    }
-  }
-
-  .description {
-    margin-top: 80px;
-    color: #999;
-  }
-
-  &.big {
-    min-height: 40vh;
-    .title {
-      padding-top: 100px;
     }
   }
 

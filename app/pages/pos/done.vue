@@ -36,7 +36,7 @@ export default {
       });
     },
     reload() {
-      location.reload();
+      this.$emit("resetPosMain");
     }
   },
   mounted() {

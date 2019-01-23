@@ -1,66 +1,45 @@
 <template>
   <div class="tutorial">
-    <div class="animation" v-show="tpay_method == 'felica'">
+    <div class="animation" v-show="method == 'felica'">
       <div class="handbox">
         <img class="hand" :class="{pause: isPause}" src="~/assets/images/felica_hand.svg" alt>
       </div>
       <img class="reader" src="~/assets/images/felica.png" alt>
     </div>
-    <qriously :value="testURL" :size="200" v-show="tpay_method == 'qr'"/>
+    <qriously :value="testURL" :size="200" v-show="method == 'qr'"/>
     <div class="warning">
       <p>{{ announceText }}</p>
-      <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
       <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
-      <el-button @click="recognization" type="text">決済テスト</el-button>
+      <el-button @click="$emit('testNext')" type="text">テスト</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
-
 export default {
   data() {
     return {
       isPause: false,
-      tpay_method: "felica",
+      method: "felica",
       testURL: "http://www.google.com"
     };
   },
   methods: {
     changeMethod() {
-      if (this.tpay_method == "felica") this.tpay_method = "qr";
-      else this.tpay_method = "felica";
+      if (this.method == "felica") this.method = "qr";
+      else this.method = "felica";
     },
-    reSelect() {
-      this.$emit("reSelect");
-    },
-    /*
-     ** 決済テスト用
-     */
-    async recognization() {
+    recognization() {
       this.isPause = true;
       this.loading = this.$loading({
         text: "Loading",
         lock: false
       });
-
-      console.log(this.method);
-
-      if (
-        await this.purchaseCreate({
-          id: this.method.id,
-          uuid: "aaaaaaa" // 決済番号
-        })
-      ) {
+      setTimeout(() => {
         this.loading.close();
         this.$emit("pushSuccess");
-      } else {
-        this.loading.close();
-        this.$ons.notification.alert("決済エラーが発生しました");
-      }
-    },
-    ...mapActions("pos/purchase", ["purchaseCreate"])
+      }, 3000);
+    }
   },
   computed: {
     changeMethodText() {
@@ -68,18 +47,9 @@ export default {
       else return "Felica認証を使う";
     },
     announceText() {
-      if (this.method == "felica")
-        return "リーダーに、Felicaをかざしてください";
+      if (this.method == "felica") return "リーダーに Felicaをかざして下さい";
       else return "スマートフォンでQRを読み取って下さい";
-    },
-
-    method() {
-      return this.payment_method.filter((_method, index) => {
-        if (_method.uuid == "4k4g96ld83") return _method;
-      })[0];
-    },
-
-    ...mapState("payment-method", ["payment_method"])
+    }
   }
 };
 </script>
@@ -145,3 +115,4 @@ export default {
   z-index: 30000 !important;
 }
 </style>
+

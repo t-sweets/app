@@ -16,7 +16,7 @@
       <total-account
         :isShowTotal="isShowTotal"
         :items="items"
-        :totalQuentity="totalQuentity"
+        :totalQuantity="totalQuantity"
         :totalPrice="totalPrice"
         @pushSuccess="pushSuccess"
         @showTotal="showTotal"
@@ -27,9 +27,9 @@
       <div class="contents tabber-contents">
         <el-row class="middle-center">
           <el-col :span="16">
-            <el-row class="quentity">
+            <el-row class="quantity">
               <el-col :span="12">お買い上げ点数</el-col>
-              <el-col :span="12">{{ totalQuentity }}点</el-col>
+              <el-col :span="12">{{ totalQuantity }}点</el-col>
             </el-row>
             <el-row class="price">
               <el-col :span="12">小計</el-col>
@@ -61,83 +61,6 @@ const uuidv4 = require("uuid/v4");
 export default {
   data() {
     return {
-      products1: [],
-      products: [
-        {
-          id: 1,
-          name: "カップ麺",
-          image_path: require("~/assets/images/Product001.png"),
-          price: 130
-        },
-        {
-          id: 2,
-          name: "ペットボトル飲料",
-          image_path: require("~/assets/images/Product002.png"),
-          price: 100
-        },
-        {
-          id: 3,
-          name: "缶ジュース",
-          image_path: require("~/assets/images/Product003.png"),
-          price: 50
-        },
-        {
-          id: 4,
-          name: "アイス",
-          image_path: require("~/assets/images/Product004.png"),
-          price: 100
-        },
-        {
-          id: 5,
-          name: "焼きおにぎり",
-          image_path: require("~/assets/images/Product005.png"),
-          price: 30
-        },
-        {
-          id: 6,
-          name: "チャーハン1/2",
-          image_path: require("~/assets/images/Product006.png"),
-          price: 80
-        },
-
-        {
-          id: 7,
-          name: "ゼリー",
-          image_path: require("~/assets/images/Product007.png"),
-          price: 30
-        },
-        {
-          id: 8,
-          name: "今川焼き",
-          image_path: require("~/assets/images/Product008.png"),
-          price: 60
-        },
-        {
-          id: 9,
-          name: "ポッキー・プリッツ小袋",
-          image_path: require("~/assets/images/Product009.png"),
-          price: 30
-        },
-        {
-          id: 10,
-          name: "スナック・チョコレート",
-          image_path: require("~/assets/images/Product010.png"),
-          price: 100
-        },
-        {
-          id: 11,
-          name: "柿の種・おかき",
-          image_path: require("~/assets/images/Product011.png"),
-          price: 50
-        },
-        {
-          id: 12,
-          name: "ラムネ菓子",
-          image_path: require("~/assets/images/Product012.png"),
-          price: 70
-        }
-      ],
-      cart: [],
       search_str: "",
       isShowTotal: false
     };
@@ -152,14 +75,14 @@ export default {
      */
     addCart(product) {
       let isExist = false;
-      this.cart.some(item => {
+      this.cart.some((item, index) => {
         if (item.id == product.id) {
           isExist = !isExist;
-          item.quentity = product.quentity;
+          this.setQuantity({ index: index, quantity: product.quantity });
           return true;
         }
       });
-      if (!isExist) this.cart.push(product);
+      if (!isExist) this.setProduct(product);
     },
     /*
      ** 商品をカートから削除
@@ -167,23 +90,24 @@ export default {
     removeCart(id) {
       this.$refs.prod.some((item, index) => {
         if (item.product.id == id) {
-          this.$refs.prod[index].quentity = 0;
+          this.$refs.prod[index].quantity = 0;
           return true;
         }
       });
       this.cart.some((item, index) => {
         if (item.id == id) {
-          this.cart.splice(index, 1);
+          this.removeProduct(index);
           this.showTotal();
           return true;
         }
       });
+      if (this.cart.length < 1) this.showTotal(false);
     },
     /*
      ** カートの内容をリセット
      */
     resetCart(id) {
-      this.cart = [];
+      this.resetProduct();
       this.$refs.prod.forEach((_, index) => {
         this.$refs.prod[index].resetCart();
       });
@@ -192,10 +116,24 @@ export default {
     /*
      ** 関数から決済パネルの表示非表示を定める
      */
-    showTotal(bool) {
+    async showTotal(bool) {
       if (bool == undefined) {
         bool = this.isShowSubtotal;
       } else {
+        if (bool) {
+          if (await this.purchaseCheck()) {
+            // 商品在庫は確立されたのでOK
+          } else {
+            this.$ons.notification.alert("商品情報が更新されました。", {
+              callback: () => {
+                this.showTotal(false);
+                this.resetCart();
+                this.getProducts();
+              }
+            });
+            return -1;
+          }
+        }
         this.isShowTotal = bool;
       }
     },
@@ -204,7 +142,11 @@ export default {
      ** 決済完了ページへ遷移
      */
     pushSuccess() {
+      // 決済結果をPOSに送信
+
       this.showTotal(false);
+      this.resetCart();
+
       this.$emit("push-page", DonePage);
     },
     /*
@@ -215,7 +157,16 @@ export default {
       this.resetCart();
       this.$emit("pop-page", MenuPage);
     },
-    ...mapMutations("pos/purchase", ["setUUID"])
+
+    ...mapMutations("pos/purchase", [
+      "setUUID",
+      "setProduct",
+      "removeProduct",
+      "setQuantity",
+      "resetProduct"
+    ]),
+    ...mapActions("pos", ["getProducts"]),
+    ...mapActions("pos/purchase", ["purchaseCheck"])
   },
   computed: {
     /*
@@ -244,7 +195,7 @@ export default {
         this.cart.some(_item => {
           if (_item.id == product.id) {
             items.push({
-              quentity: _item.quentity,
+              quantity: _item.quantity,
               ...product
             });
           }
@@ -255,12 +206,12 @@ export default {
     /*
      ** 合計商品数
      */
-    totalQuentity() {
-      let quentity = 0;
+    totalQuantity() {
+      let quantity = 0;
       this.items.forEach(item => {
-        quentity += item.quentity;
+        quantity += item.quantity;
       });
-      return quentity;
+      return quantity;
     },
     /*
      ** 合計金額
@@ -268,30 +219,14 @@ export default {
     totalPrice() {
       let price = 0;
       this.items.forEach(item => {
-        price += item.price * item.quentity;
+        price += item.price * item.quantity;
       });
       return price.toLocaleString();
-    }
-  },
-  // async created() {
-  //   await this.$axios({
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json;charset=UTF-8",
-  //       "Access-Control-Allow-Origin": "*",
-  //       ...this.$store.state.auth
-  //     },
-  //     url: "api/v1/products"
-  //   })
-  //     .then(response => {
-  //       console.log(response);
+    },
 
-  //       this.products = response.data;
-  //     })
-  //     .catch(err => {
-  //       this.$ons.notification.alert("Error: Cant load products list");
-  //     });
-  // },
+    ...mapState("pos", ["products"]),
+    ...mapState("pos/purchase", ["cart"])
+  },
   mounted() {
     const transactionUUID = uuidv4();
     this.setUUID(transactionUUID);
@@ -306,7 +241,7 @@ export default {
     margin: 0 auto;
     .el-row {
       margin-top: 8px;
-      .quentity {
+      .quantity {
         color: #777;
       }
       .tab-button {

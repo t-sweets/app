@@ -38,17 +38,20 @@ module.exports = {
   plugins: [
     '~/plugins/element-ui',
     '~/plugins/sweet-modal',
+    '~/plugins/vue-qriously'
   ],
 
   /*
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
     '@nuxtjs/dotenv',
     'nuxt-onsenui-module',
     ['nuxt-sass-resources-loader', [
       '@/assets/sass/foundation/mixin.scss'
     ]],
+    'nuxt-fontawesome'
   ],
 
   router: {
@@ -56,6 +59,16 @@ module.exports = {
   },
 
   dev: process.env.NODE_ENV === 'development',
+
+
+  fontawesome: {
+    imports: [
+      {
+        set: '@fortawesome/free-solid-svg-icons',
+        icons: ['fas']
+      }
+    ]
+  },
 
   /*
   ** Build configuration
@@ -79,5 +92,8 @@ module.exports = {
         config.target = 'electron-renderer'
       }
     }
-  }
+  },
+  server: {
+    port: 13000, // デフォルト: 3000
+  },
 }

@@ -21,28 +21,32 @@
 export default {
   data() {
     return {
-      quentity: 0
+      quantity: 0
     };
   },
   props: ["product"],
   methods: {
     add(id) {
-      this.quentity++;
-      this.addCart({ id: id, quentity: this.quentity });
+      this.quantity++;
+      this.addCart({
+        id: id,
+        quantity: this.quantity,
+        price: this.product.price
+      });
     },
     addCart(product) {
       this.$emit("addCart", product);
     },
     resetCart() {
-      this.quentity = 0;
+      this.quantity = 0;
     }
   },
   computed: {
     styles() {
-      return this.quentity > 0 ? this.quentity : "";
+      return this.quantity > 0 ? this.quantity : "";
     },
     isSelected() {
-      return this.quentity > 0;
+      return this.quantity > 0;
     }
   }
 };

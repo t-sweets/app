@@ -10,86 +10,68 @@
         >Cancel</v-ons-button>
       </el-col>
       <el-col class="nav-title" :span="16">
-        <span>お会計</span>
+        <span>{{ title }}</span>
       </el-col>
       <el-col :span="4"></el-col>
     </el-row>
-    <div class="products" v-show="!paymethod">
-      <el-row class="contents" v-for="item in items" :key="item.id">
-        <el-col class="image" :span="7">
-          <img :src="item.image_path" alt>
-        </el-col>
-        <el-col :span="16">
-          <div class="middle-center">
-            <p class="product-name">{{ item.name }}</p>
-            <p class="product-quantity">{{ item.quantity }}個</p>
-          </div>
-        </el-col>
-        <el-col :span="1">
-          <div class="middle-center">
-            <el-button icon="el-icon-delete" circle @click="remove(item.id)"></el-button>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-    <div class="total">
-      <el-row class="quantity">
-        <el-col :span="20">お買い上げ点数</el-col>
-        <el-col class="right" :span="4">{{ totalQuantity }}点</el-col>
-      </el-row>
-      <el-row class="price">
-        <el-col :span="20">合計金額</el-col>
-        <el-col class="right" :span="4">¥{{ totalPrice }}</el-col>
-      </el-row>
-    </div>
     <transition name="buttons">
-      <div class="payment-btns" v-if="!paymethod">
-        <el-row>
-          <el-col :span="10" v-for="method in payment_method" :key="method.id" :offset="1">
-            <el-button
-              type="primary"
-              round
-              @click="paymethod = method.uuid"
-              icon="el-icon-message"
-            >{{ method.name }}</el-button>
-          </el-col>
-        </el-row>
+      <t-pay
+        v-if="!addReady && uuid  == '4k4g96ld83'"
+        @pushSuccess="pushSuccess"
+        @testNext="testNext"
+      ></t-pay>
+    </transition>
+    <transition name="sequence">
+      <div v-show="addReady">
+        <div class="charge-price">
+          <el-input-number v-model="price" size="large" :min="500" :step="500" :max="10000"></el-input-number>
+        </div>
+        <div class="total">
+          <el-row class="quantity">
+            <el-col :span="20">チャージ先</el-col>
+            <el-col class="right" :span="4">{{ methodName }}</el-col>
+          </el-row>
+          <el-row class="price">
+            <el-col :span="20">合計金額</el-col>
+            <el-col class="right" :span="4">¥{{ price }}</el-col>
+          </el-row>
+        </div>
+
+        <div class="payment-btns">
+          <el-button type="primary" round icon="el-icon-message">チャージをする</el-button>
+        </div>
       </div>
-    </transition>
-    <transition name="sequence">
-      <t-pay v-if="paymethod=='4k4g96ld83'" @pushSuccess="pushSuccess" @reSelect="reSelect"></t-pay>
-    </transition>
-    <transition name="sequence">
-      <q-r-pay v-if="paymethod=='qrcode'" @pushSuccess="pushSuccess" @reSelect="reSelect"></q-r-pay>
     </transition>
   </v-ons-dialog>
 </template>
 
 <script>
-import TPay from "~/components/pos/TPaySequence";
+import TPay from "~/components/charge/TPayChargeSequence";
 import QRPay from "~/components/pos/QRPaySequence";
-import { mapState } from "vuex";
+
 export default {
   data() {
     return {
-      paymethod: undefined
+      price: 500,
+      addReady: false
     };
   },
-  props: ["isShowTotal", "items", "totalPrice", "totalQuantity"],
+  props: ["isShowTotal", "selectedMethod"],
   methods: {
     change(bool) {
-      this.paymethod = undefined;
+      if (!bool) this.resetData();
       this.$emit("showTotal", bool);
     },
-    remove(id) {
-      this.$emit("removeCart", id);
+    resetData() {
+      this.addReady = false;
+      this.price = 500;
     },
     tpay() {
       this.change(false);
       this.$emit("pushTPay");
     },
-    reSelect() {
-      this.paymethod = undefined;
+    testNext() {
+      this.addReady = true;
     },
     pushSuccess() {
       this.$emit("pushSuccess");
@@ -100,7 +82,22 @@ export default {
     QRPay
   },
   computed: {
-    ...mapState("payment-method", ["payment_method"])
+    methodName() {
+      return this.selectedMethod ? this.selectedMethod.name : "";
+    },
+    title() {
+      if (this.addReady || !this.selectedMethod) {
+        return "チャージ金額を入力";
+      } else {
+        switch (this.selectedMethod.uuid) {
+          case "4k4g96ld83":
+            return "ユーザー認証";
+        }
+      }
+    },
+    uuid() {
+      return this.selectedMethod ? this.selectedMethod.uuid : "";
+    }
   }
 };
 </script>
@@ -116,10 +113,14 @@ export default {
       margin-top: 12px;
     }
   }
-  .products {
+  .charge-price {
     border-bottom: solid 0.5px #999;
-    max-height: 40vh;
-    overflow: scroll;
+    height: 30vh;
+    .el-input-number {
+      width: 80%;
+      line-height: calc(80px - 2px);
+      margin: 75px 10%;
+    }
   }
   .contents {
     width: 80%;
@@ -165,9 +166,8 @@ export default {
     }
   }
   .payment-btns {
-    width: 100%;
+    width: 80%;
     margin: 20px auto;
-    margin-left: 3%;
     button {
       width: 100%;
       font-size: 20px;
@@ -176,54 +176,33 @@ export default {
     }
   }
 }
-.buttons-enter-active {
-  animation-name: fadeInButtons;
-  animation-duration: 0.5s;
-}
 .buttons-leave-active {
   animation-name: fadeOutButtons;
-  animation-duration: 1s;
+  animation-duration: 0.7s;
 }
 .buttons-leave {
-  margin-right: 0px;
   opacity: 0;
-}
-.sequence-enter {
-  margin-left: 100%;
-  margin-top: -80px;
 }
 .sequence-enter-active {
   animation-name: fadeInSequence;
-  animation-duration: 1s;
-  margin-top: -80px;
-}
-@keyframes fadeInButtons {
-  from {
-    margin-right: 100%;
-    opacity: 0;
-  }
-  to {
-    margin-right: 10%;
-    opacity: 1;
-  }
+  animation-duration: 1.4s;
 }
 @keyframes fadeOutButtons {
   from {
-    margin-right: 0%;
     opacity: 1;
   }
   to {
-    margin-right: 100%;
     opacity: 0;
   }
 }
 @keyframes fadeInSequence {
-  from {
-    margin-left: 100%;
+  0% {
     opacity: 0;
   }
-  to {
-    margin-left: 0%;
+  50% {
+    opacity: 0;
+  }
+  100% {
     opacity: 1;
   }
 }
@@ -245,6 +224,21 @@ export default {
   @media screen and (min-width: 1024px) {
     .dialog {
       width: 60%;
+    }
+  }
+}
+
+.charge-price {
+  .el-input-number {
+    .el-input {
+      font-size: 50px;
+      .el-input__inner {
+        height: 80px;
+      }
+    }
+    .el-input-number__increase,
+    .el-input-number__decrease {
+      font-size: 20px;
     }
   }
 }

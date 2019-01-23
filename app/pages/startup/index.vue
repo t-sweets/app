@@ -4,7 +4,7 @@
       <div class="top-image">
         <img src="~/assets/images/icon.svg" width="20%" alt>
         <p class="top-text">田胡研Sweets
-          <br>電子決済システム
+          <br>POSシステム
         </p>
       </div>
 
@@ -18,6 +18,7 @@
 
 <script>
 import pos from "~/pages/pos/index";
+import { mapActions } from "vuex";
 
 export default {
   data() {
@@ -28,17 +29,29 @@ export default {
   methods: {
     start() {
       this.$emit("push-page", pos);
-    }
+    },
+    ...mapActions("pos", ["getProducts"]),
+    ...mapActions("payment-method", ["getPaymentMethod"])
   },
-  mounted() {
+  async mounted() {
     // some connection access
-    let test = setInterval(() => {
-      this.progress += 10;
-      if (this.progress >= 100) {
-        clearInterval(test);
-        this.start();
-      }
-    }, 200);
+    const initializeMethods = [this.getPaymentMethod(), this.getProducts()];
+
+    initializeMethods.forEach(func => {
+      setTimeout(async () => {
+        await func;
+        this.progress += 100 / initializeMethods.length;
+        if (this.progress >= 100) this.start();
+      }, 100);
+    });
+
+    // let test = setInterval(() => {
+    //   this.progress += 10;
+    //   if (this.progress >= 100) {
+    //     clearInterval(test);
+    //     this.start();
+    //   }
+    // }, 100);
   }
 };
 </script>
