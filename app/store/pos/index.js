@@ -92,7 +92,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 // ...this.$store.state.auth
             },
-            url: "api/v1/products"
+            url: "http://localhost:3000/api/v1/products"
         })
         .then(response => {
             commit("setProducts", response.data)

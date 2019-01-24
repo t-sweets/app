@@ -53,7 +53,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 // ...this.$store.state.auth
             },
-            url: "api/v1/purchase/check",
+            url: "http://localhost:3000/api/v1/purchases/check",
             data: {
                 products: products
             },
@@ -85,7 +85,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 // ...this.$store.state.auth
             },
-            url: "api/v1/purchases",
+            url: "http://localhost:3000/api/v1/purchases",
             data: {
                 products: products,
                 payment_method: data.id,

@@ -13,6 +13,20 @@
       <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
       <el-button @click="recognization" type="text">決済テスト</el-button>
     </div>
+
+    <sweet-modal
+      ref="modal"
+      width="80%"
+      overlay-theme="dark"
+      :blocking="true"
+      :hide-close-button="true"
+      icon="success"
+    >
+      <div class="main">
+        <p>決済がタイムアウトしました</p>
+        <el-button type="primary" @click="preparePayment();" round>もう一度</el-button>
+      </div>
+    </sweet-modal>
   </div>
 </template>
 
@@ -29,11 +43,27 @@ export default {
   },
   methods: {
     changeMethod() {
-      if (this.tpay_method == "felica") this.tpay_method = "qr";
-      else this.tpay_method = "felica";
+      if (this.tpay_method == "felica") {
+        this.tpay_method = "qr";
+      } else {
+        this.tpay_method = "felica";
+        this.preparePayment();
+      }
     },
     reSelect() {
       this.$emit("reSelect");
+    },
+    /*
+     ** カードリーダーを起動する
+     */
+    preparePayment() {
+      if (!this.isReading) {
+        //決済端末を起動
+        this.execCardReader(["Payment Price", this.totalPrice]);
+      } else {
+        // 起動済みなら、メッセージの書き換えのみ
+        this.showMessage(["Payment Price", this.totalPrice]);
+      }
     },
     /*
      ** 決済テスト用
@@ -44,8 +74,6 @@ export default {
         text: "Loading",
         lock: false
       });
-
-      console.log(this.method);
 
       if (
         await this.purchaseCreate({
@@ -60,15 +88,16 @@ export default {
         this.$ons.notification.alert("決済エラーが発生しました");
       }
     },
-    ...mapActions("pos/purchase", ["purchaseCreate"])
+    ...mapActions("pos/purchase", ["purchaseCreate"]),
+    ...mapActions("t-pay/card-reader", ["execCardReader", "showMessage"])
   },
   computed: {
     changeMethodText() {
-      if (this.method == "felica") return "QRコード認証を使う";
+      if (this.tpay_method == "felica") return "QRコード認証を使う";
       else return "Felica認証を使う";
     },
     announceText() {
-      if (this.method == "felica")
+      if (this.tpay_method == "felica")
         return "リーダーに、Felicaをかざしてください";
       else return "スマートフォンでQRを読み取って下さい";
     },
@@ -79,7 +108,25 @@ export default {
       })[0];
     },
 
-    ...mapState("payment-method", ["payment_method"])
+    totalPrice() {
+      let total = 0;
+      this.cart.forEach(product => {
+        total += product.price * product.quantity;
+      });
+      return total;
+    },
+
+    ...mapState("payment-method", ["payment_method"]),
+    ...mapState("pos/purchase", ["cart"]),
+    ...mapState("t-pay/card-reader", [
+      "displayText",
+      "idm",
+      "isPayment",
+      "readingTimeout"
+    ])
+  },
+  created() {
+    this.preparePayment();
   }
 };
 </script>
