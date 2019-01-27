@@ -9,7 +9,8 @@ RUN apk update && \
 
 COPY package.json /app/
 
-RUN npm install
+RUN npm install && \
+    npm cache clean
 
 ENV HOST 0.0.0.0
 EXPOSE 13000
