@@ -99,6 +99,7 @@ export default {
             password: this.login.password
           })
         ) {
+          this.$refs.modal.close();
           this.$emit("push-page", adminPage);
         }
       } else {

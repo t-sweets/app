@@ -104,6 +104,9 @@ export const mutations = {
 }
 
 export const actions = {
+    /**
+     * POS起動時に実行. 
+     */
     async initialize({ commit }) {
         const response = await this.$axios({
             method: "POST",
@@ -121,16 +124,15 @@ export const actions = {
             return false
         });
 
-        if (response.status == 200) {
+        // 正常に通信が完了し、なおかつPOS権限を持っている場合
+        if (response.status == 200 && response.data.data.authority_id == 2) {
             await commit("setAuth", {
                 access_token: response.headers["access-token"],
                 client: response.headers["client"],
                 uid: response.headers["uid"]
             });
-
             return true
         } else {
-
             return false
         }
 

@@ -65,6 +65,9 @@ export default {
   }
   display: inline-block;
   text-align: center;
+  canvas {
+    display: table;
+  }
 }
 
 .animation {

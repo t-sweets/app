@@ -38,7 +38,8 @@ module.exports = {
   plugins: [
     '~/plugins/element-ui',
     '~/plugins/sweet-modal',
-    '~/plugins/vue-qriously'
+    '~/plugins/vue-qriously',
+    '~/plugins/myFunctions'
   ],
 
   /*

@@ -26,6 +26,7 @@ import pos from "~/pages/payment/";
 import MenuButton from "~/components/admin/MenuButton";
 
 import product_manager from "~/pages/admin/product_manager";
+import inventory_manager from "~/pages/admin/inventory_manager";
 
 import { mapState, mapActions } from "vuex";
 
@@ -41,25 +42,26 @@ export default {
           description: "商品情報などの設定",
           icon: ["fas", "tag"],
           page: product_manager,
-          authory: [0]
+          authory: [1]
         },
         {
           title: "在庫管理",
           description: "在庫や、表示/非表示の管理",
           icon: ["fas", "yen-sign"],
-          authory: [0, 1]
+          page: inventory_manager,
+          authory: [1, 3]
         },
         {
           title: "点検・生産",
           description: "入出金、レジチェックなど",
           icon: ["fas", "money-check-alt"],
-          authory: [0]
+          authory: [1]
         },
         {
           title: "売上",
           description: "日別売上、商品別売上など",
           icon: ["fas", "chart-line"],
-          authory: [0]
+          authory: [1]
         }
       ]
     };

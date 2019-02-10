@@ -6,7 +6,7 @@ export const state = () => ({
     },
     user: {
         name: null,
-        authority: null,
+        authority: null,    // 1:admin, 2:pos, 3:arriver
     },
 });
 

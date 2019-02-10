@@ -30,6 +30,7 @@ export default {
       this.quantity++;
       this.addCart({
         id: id,
+        name: this.product.name,
         quantity: this.quantity,
         price: this.product.price
       });
