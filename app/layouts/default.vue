@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import start from "~/pages/startup/index";
-import index from "~/pages/pos/index";
+import start from "~/pages/startup/";
+import index from "~/pages/payment/";
 export default {
   // middleware: ["authenticated"],
   data() {

@@ -59,15 +59,11 @@
     <transition name="sequence">
       <t-pay v-if="paymethod=='4k4g96ld83'" @pushSuccess="pushSuccess" @reSelect="reSelect"></t-pay>
     </transition>
-    <transition name="sequence">
-      <q-r-pay v-if="paymethod=='qrcode'" @pushSuccess="pushSuccess" @reSelect="reSelect"></q-r-pay>
-    </transition>
   </v-ons-dialog>
 </template>
 
 <script>
-import TPay from "~/components/pos/TPaySequence";
-import QRPay from "~/components/pos/QRPaySequence";
+import TPay from "~/components/payment/TPaySequence";
 import { mapState } from "vuex";
 export default {
   data() {
@@ -96,11 +92,10 @@ export default {
     }
   },
   components: {
-    TPay,
-    QRPay
+    TPay
   },
   computed: {
-    ...mapState("payment-method", ["payment_method"])
+    ...mapState("pos/payment-method", ["payment_method"])
   }
 };
 </script>

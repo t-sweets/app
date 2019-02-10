@@ -47,7 +47,6 @@
 
 <script>
 import TPay from "~/components/charge/TPayChargeSequence";
-import QRPay from "~/components/pos/QRPaySequence";
 
 export default {
   data() {
@@ -78,8 +77,7 @@ export default {
     }
   },
   components: {
-    TPay,
-    QRPay
+    TPay
   },
   computed: {
     methodName() {

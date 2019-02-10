@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import pos from "~/pages/pos/index.vue";
+import pos from "~/pages/payment/";
 import ChargeDialog from "~/components/charge/ChargeDialog";
 import PaymentButton from "~/components/charge/PaymentButton";
 
@@ -54,7 +54,7 @@ export default {
       this.selectedMethod = method;
       this.showTotal(true);
     },
-    ...mapActions("payment-method", ["getPaymentMethod"])
+    ...mapActions("pos/payment-method", ["getPaymentMethod"])
   },
   computed: {
     methods() {
@@ -64,7 +64,7 @@ export default {
       });
       return methods;
     },
-    ...mapState("payment-method", ["payment_method"])
+    ...mapState("pos/payment-method", ["payment_method"])
   },
   async created() {}
 };

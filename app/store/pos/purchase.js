@@ -37,7 +37,7 @@ export const mutations = {
 }
 
 export const actions = {
-    async purchaseCheck({commit, state}) {
+    async purchaseCheck({commit, state, rootState}) {
         let products = [];
         state.cart.some((product, index) => {
             products.push({
@@ -51,7 +51,7 @@ export const actions = {
             headers: {
                 "Content-Type": "application/json;charset=UTF-8",
                 "Access-Control-Allow-Origin": "*",
-                // ...this.$store.state.auth
+                ...rootState.pos.auth
             },
             url: "http://localhost:3000/api/v1/purchases/check",
             data: {
@@ -69,7 +69,7 @@ export const actions = {
      * 
      * @param {*} data payment method data
      */
-    async purchaseCreate({commit, state}, data) {
+    async purchaseCreate({commit, state, rootState}, data) {
         let products = [];
         state.cart.some((product) => {
             products.push({
@@ -83,7 +83,7 @@ export const actions = {
             headers: {
                 "Content-Type": "application/json;charset=UTF-8",
                 "Access-Control-Allow-Origin": "*",
-                // ...this.$store.state.auth
+                ...rootState.pos.auth
             },
             url: "http://localhost:3000/api/v1/purchases",
             data: {

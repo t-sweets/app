@@ -6,7 +6,7 @@
       </div>
       <div class="center">商品一覧</div>
     </v-ons-toolbar>
-    <v-ons-search-input placeholder="Search something" v-model="search_str"></v-ons-search-input>
+    <v-ons-search-input placeholder="商品を検索" v-model="search_str"></v-ons-search-input>
     <el-row>
       <el-col :span="5" v-for="product in search" :key="product.id" :offset="0">
         <products ref="prod" :product="product" @addCart="addCart"/>
@@ -51,10 +51,10 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
-import Products from "~/components/pos/Products.vue";
-import TotalAccount from "~/components/pos/TotalAccount.vue";
-import MenuPage from "~/pages/pos/menu";
-import DonePage from "~/pages/pos/done";
+import Products from "~/components/payment/Products.vue";
+import TotalAccount from "~/components/payment/TotalAccount.vue";
+import MenuPage from "~/pages/menu/";
+import DonePage from "~/pages/payment/done";
 
 const uuidv4 = require("uuid/v4");
 

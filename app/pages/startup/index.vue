@@ -9,15 +9,14 @@
       </div>
 
       <div class="progress" style="text-align: center">
-        <!-- <el-button round type="primary" @click="start">Start</el-button> -->
-        <el-progress :percentage="progress"></el-progress>
+        <el-progress :percentage="Math.round(progress)"></el-progress>
       </div>
     </div>
   </v-ons-page>
 </template>
 
 <script>
-import pos from "~/pages/pos/index";
+import pos from "~/pages/payment/";
 import { mapActions } from "vuex";
 
 export default {
@@ -30,28 +29,64 @@ export default {
     start() {
       this.$emit("push-page", pos);
     },
-    ...mapActions("pos", ["getProducts"]),
-    ...mapActions("payment-method", ["getPaymentMethod"])
+    initError({ title, message }) {
+      this.$ons.notification.alert({
+        title: title,
+        message: message,
+        callback: () => {
+          this.$ons.notification
+            .confirm({
+              message: "再起動しますか？",
+              buttonLabels: ["再起動"],
+              primaryButtonIndex: 0
+            })
+            .then(index => {
+              if (index == 0) location.reload();
+            });
+        }
+      });
+    },
+    ...mapActions("pos", ["initialize", "getProducts"]),
+    ...mapActions("pos/payment-method", ["getPaymentMethod"])
   },
   async mounted() {
-    // some connection access
-    const initializeMethods = [this.getPaymentMethod(), this.getProducts()];
+    const initializeMethods = [
+      this.initialize,
+      this.getProducts,
+      this.getPaymentMethod
+    ];
 
-    initializeMethods.forEach(func => {
-      setTimeout(async () => {
-        await func;
+    for (let i = 0; i < initializeMethods.length; i++) {
+      const func = initializeMethods[i];
+      if (await func()) {
         this.progress += 100 / initializeMethods.length;
-        if (this.progress >= 100) this.start();
-      }, 100);
-    });
-
-    // let test = setInterval(() => {
-    //   this.progress += 10;
-    //   if (this.progress >= 100) {
-    //     clearInterval(test);
-    //     this.start();
-    //   }
-    // }, 100);
+        await new Promise(resolve => setTimeout(resolve, 500)); // sleep
+        if (this.progress >= 99) this.start();
+        else continue;
+      } else {
+        let title = "POSを起動できませんでした",
+          message;
+        // エラーメッセージの設定
+        switch (i) {
+          case 0:
+            message = "POS端末の認証にエラーが発生しました";
+            break;
+          case 1:
+            message = "商品情報を取得できませんでした";
+            break;
+          case 2:
+            message = "決済情報を取得できませんでした";
+            break;
+          default:
+            message = "不明なエラーが発生しました";
+        }
+        this.initError({
+          title: title,
+          message: message
+        });
+        break;
+      }
+    }
   }
 };
 </script>

@@ -2,7 +2,7 @@
   <el-card :body-style="{ padding: '0px' }">
     <div class="product-card" :class="menu.size">
       <div class="title">
-        <font-awesome-icon class="card-icon" :icon="menu.icon"/>
+        <font-awesome-icon v-if="menu.icon" class="card-icon" :icon="menu.icon"/>
         <span>{{ menu.title }}</span>
       </div>
       <div class="description">
@@ -30,13 +30,13 @@ export default {
     padding: 0 auto;
     font-size: 35px;
     color: #409eff;
+    line-height: 140px;
     span {
       margin-left: 15px;
     }
   }
 
   .description {
-    margin-top: 80px;
     color: #999;
   }
 

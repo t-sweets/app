@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import pos from "~/pages/pos/index";
+import pos from "~/pages/payment/index";
 import charge from "~/pages/charge/index";
 import MenuButton from "~/components/menu/MenuButton";
 

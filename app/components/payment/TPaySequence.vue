@@ -116,7 +116,7 @@ export default {
       return total;
     },
 
-    ...mapState("payment-method", ["payment_method"]),
+    ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"]),
     ...mapState("t-pay/card-reader", [
       "displayText",
