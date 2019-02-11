@@ -10,26 +10,35 @@
       </div>
     </v-ons-toolbar>
 
+    <v-ons-search-input placeholder="商品を検索" v-model="search_str"></v-ons-search-input>
+
     <el-table
-      :data="old_products"
+      class="manage-list"
+      :data="products"
       :default-sort="{prop: 'id', order: 'ascending'}"
       style="width: 100%"
     >
-      <el-table-column prop="id" label="id" sortable width="80"></el-table-column>
       <el-table-column prop="name" label="Name"></el-table-column>
       <el-table-column prop="price" label="Price" sortable width="150"></el-table-column>
-      <el-table-column prop="stock" label="Stock" sortable width="150"></el-table-column>
-      <el-table-column prop="cost" label="Cost" sortable width="150"></el-table-column>
-      <el-table-column prop="display" label="Display" sortable width="100">
+      <el-table-column prop="stock" label="現在在庫" sortable width="130"></el-table-column>
+      <el-table-column prop="stock" label="変更後在庫" width="200">
         <template slot-scope="scope">
-          <el-switch
-            :value="scope.row.display"
-            @change="setDisplay({
-                id: scope.row.id,
-                display: !scope.row.display
-            })"
+          <el-input-number size="small" v-model="changes.stocks[scope.row.id]"></el-input-number>
+        </template>
+      </el-table-column>
+      <el-table-column prop="display" label="表示" sortable width="130">
+        <template slot-scope="scope">
+          <v-ons-switch v-model="changes.display[scope.row.id]"></v-ons-switch>
+        </template>
+      </el-table-column>
+      <el-table-column prop="notification" label="在庫通知/通知個数" width="230">
+        <template slot-scope="scope">
+          <v-ons-switch
+            v-model="changes.notifications[scope.row.id]"
             active-color="#13ce66"
-          ></el-switch>
+            style="vertical-align:middle;"
+          ></v-ons-switch>
+          <el-input-number size="small" v-model="changes.notification_stocks[scope.row.id]"></el-input-number>
         </template>
       </el-table-column>
     </el-table>
@@ -38,16 +47,13 @@
       <div class="contents tabber-contents">
         <el-row class="middle-center">
           <el-col :span="4">
-            <el-button class="tab-button">商品を追加する</el-button>
+            <el-button class="tab-button" @click="resetList">Reset</el-button>
           </el-col>
-          <el-col :span="4">
-            <el-button class="tab-button">Default</el-button>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="16">
             <div style="width:100%;height:10px;"></div>
           </el-col>
           <el-col :span="4">
-            <el-button class="tab-button" type="primary" @click="resetCart()">保存する</el-button>
+            <el-button class="tab-button" type="primary" @click="updateProducts">保存する</el-button>
           </el-col>
         </el-row>
       </div>
@@ -61,29 +67,86 @@ import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      products: []
+      search_str: "",
+      display: true,
+      changes: {
+        stocks: {},
+        notifications: {},
+        notification_stocks: {},
+        display: {}
+      }
     };
   },
   computed: {
-    new_products: {
-      get() {
-        return this.old_products;
-      },
-      set(value) {
-        console.log(value);
+    /**
+     * 検索にヒットした商品情報を返す
+     */
+    products() {
+      if (this.search_str == "") return this.oldProducts;
+      else {
+        let items = [];
+        this.oldProducts.forEach(product => {
+          if (product.name.indexOf(this.search_str) > -1) items.push(product);
+        });
+        return items;
       }
     },
     ...mapState("pos/admin", ["user"]),
     ...mapState("pos/admin/products-manager", {
-      old_products: state => state.products
+      oldProducts: state => state.products
     })
   },
   methods: {
-    ...mapActions("pos/admin/products-manager", ["getProducts"]),
+    /**
+     * 在庫数UPDATE
+     */
+    async updateProducts() {
+      let isSuccess = false;
+      for (let k in this.changes.stocks) {
+        if (
+          this.products.some(item => {
+            return (
+              item.id == k &&
+              (item.stock != this.changes.stocks[k] ||
+                item.notification != this.changes.notification[k])
+            );
+          })
+        ) {
+          if (
+            await this.setStocks({
+              id: k,
+              data: {
+                stock: this.changes.stocks[k],
+                notification: this.changes.notifications[k],
+                notification_stock: this.changes.notification_stocks[k],
+                display: this.changes.display[k]
+              }
+            })
+          ) {
+            this.$notify({
+              title: "Success",
+              message: "商品在庫を更新しました",
+              type: "success",
+              duration: 3000
+            });
+          }
+        }
+      }
+    },
+    resetList() {
+      this.oldProducts.forEach(item => {
+        this.changes.stocks[item.id] = item.stock;
+        this.changes.notifications[item.id] = item.notification;
+        this.changes.notification_stocks[item.id] = item.notification_stock;
+        this.changes.display[item.id] = item.display;
+      });
+    },
+    ...mapActions("pos/admin/products-manager", ["getProducts", "setStocks"]),
     ...mapMutations("pos/admin/products-manager", ["setDisplay"])
   },
   async mounted() {
     if (await this.getProducts()) {
+      await this.resetList();
     } else {
       this.$ons.notification.alert({
         title: "通信エラー",
@@ -137,9 +200,7 @@ ons-search-input {
   width: 100%;
   height: 80px;
 }
-</style>
 
-<style lang="scss" scoped>
 .toolbar {
   .right {
     > * {
@@ -148,3 +209,27 @@ ons-search-input {
   }
 }
 </style>
+
+<style lang="scss">
+.manage-list {
+  ons-switch.switch {
+    min-width: 40px;
+    width: 40px;
+    height: 20px;
+    :checked + .switch__toggle {
+      background-color: #44db5e;
+    }
+
+    .switch__toggle {
+      box-shadow: none;
+      background-color: #dcdfe6;
+      .switch__handle {
+        width: 16px;
+        height: 16px;
+        box-shadow: none;
+      }
+    }
+  }
+}
+</style>
+
