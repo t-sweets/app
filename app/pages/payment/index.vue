@@ -108,6 +108,7 @@ export default {
      */
     resetCart(id) {
       this.resetProduct();
+      if (!this.$refs.prod) return false;
       this.$refs.prod.forEach((_, index) => {
         this.$refs.prod[index].resetCart();
       });
