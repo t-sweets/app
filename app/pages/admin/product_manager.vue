@@ -26,12 +26,12 @@
           <el-input-number size="small" v-model="changes.stocks[scope.row.id]"></el-input-number>
         </template>
       </el-table-column>
-      <el-table-column prop="display" label="表示" sortable width="130">
+      <el-table-column prop="display" label="表示" sortable width="100">
         <template slot-scope="scope">
           <v-ons-switch v-model="changes.display[scope.row.id]"></v-ons-switch>
         </template>
       </el-table-column>
-      <el-table-column prop="notification" label="在庫通知/通知個数" width="230">
+      <el-table-column prop="notification" label="在庫通知/通知個数" width="200">
         <template slot-scope="scope">
           <v-ons-switch
             v-model="changes.notifications[scope.row.id]"
@@ -41,15 +41,25 @@
           <el-input-number size="small" v-model="changes.notification_stocks[scope.row.id]"></el-input-number>
         </template>
       </el-table-column>
+      <el-table-column width="10">
+        <template slot-scope="scope">
+          <el-button type="text">
+            <font-awesome-icon :icon="['fas', 'adjust']"/>
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <div class="tabber">
       <div class="contents tabber-contents">
         <el-row class="middle-center">
           <el-col :span="4">
+            <el-button class="tab-button" @click="$refs.createModal.open()">商品の追加</el-button>
+          </el-col>
+          <el-col :span="4">
             <el-button class="tab-button" @click="resetList">Reset</el-button>
           </el-col>
-          <el-col :span="16">
+          <el-col :span="12">
             <div style="width:100%;height:10px;"></div>
           </el-col>
           <el-col :span="4">
@@ -59,11 +69,14 @@
       </div>
     </div>
     <div style="height:80px;"></div>
+
+    <create-product ref="createModal"/>
   </v-ons-page>
 </template>
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import CreateProduct from "~/components/admin/CreateProduct";
 export default {
   data() {
     return {
@@ -77,24 +90,8 @@ export default {
       }
     };
   },
-  computed: {
-    /**
-     * 検索にヒットした商品情報を返す
-     */
-    products() {
-      if (this.search_str == "") return this.oldProducts;
-      else {
-        let items = [];
-        this.oldProducts.forEach(product => {
-          if (product.name.indexOf(this.search_str) > -1) items.push(product);
-        });
-        return items;
-      }
-    },
-    ...mapState("pos/admin", ["user"]),
-    ...mapState("pos/admin/products-manager", {
-      oldProducts: state => state.products
-    })
+  components: {
+    CreateProduct
   },
   methods: {
     /**
@@ -113,7 +110,7 @@ export default {
           })
         ) {
           if (
-            await this.setStocks({
+            await this.updateProduct({
               id: k,
               data: {
                 stock: this.changes.stocks[k],
@@ -133,6 +130,9 @@ export default {
         }
       }
     },
+    /**
+     * 情報を更新前にリセット
+     */
     resetList() {
       this.oldProducts.forEach(item => {
         this.changes.stocks[item.id] = item.stock;
@@ -141,8 +141,29 @@ export default {
         this.changes.display[item.id] = item.display;
       });
     },
-    ...mapActions("pos/admin/products-manager", ["getProducts", "setStocks"]),
-    ...mapMutations("pos/admin/products-manager", ["setDisplay"])
+    ...mapActions("pos/admin/products-manager", [
+      "getProducts",
+      "updateProduct"
+    ])
+  },
+  computed: {
+    /**
+     * 検索にヒットした商品情報を返す
+     */
+    products() {
+      if (this.search_str == "") return this.oldProducts;
+      else {
+        let items = [];
+        this.oldProducts.forEach(product => {
+          if (product.name.indexOf(this.search_str) > -1) items.push(product);
+        });
+        return items;
+      }
+    },
+    ...mapState("pos/admin", ["user"]),
+    ...mapState("pos/admin/products-manager", {
+      oldProducts: state => state.products
+    })
   },
   async mounted() {
     if (await this.getProducts()) {

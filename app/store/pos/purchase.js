@@ -90,7 +90,7 @@ export const actions = {
             url: "http://localhost:3000/api/v1/purchases",
             data: {
                 products: products,
-                payment_method: data.id,
+                payment_method_id: data.id,
                 payment_uuid: data.uuid
             },
             timeout : 5000,

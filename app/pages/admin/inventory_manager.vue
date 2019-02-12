@@ -113,7 +113,7 @@ export default {
           })
         ) {
           if (
-            await this.setStocks({
+            await this.updateProduct({
               id: k,
               data: {
                 stock: this.changes.stocks[k],
@@ -141,8 +141,10 @@ export default {
         this.changes.display[item.id] = item.display;
       });
     },
-    ...mapActions("pos/admin/products-manager", ["getProducts", "setStocks"]),
-    ...mapMutations("pos/admin/products-manager", ["setDisplay"])
+    ...mapActions("pos/admin/products-manager", [
+      "getProducts",
+      "updateProduct"
+    ])
   },
   async mounted() {
     if (await this.getProducts()) {

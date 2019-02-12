@@ -6,6 +6,9 @@ export const mutations = {
     setProducts(state, products) {
         state.products = products;
     },
+    addProduct(state, product) {
+        state.products.push(product);
+    },
     updateProduct(state, data) {
         state.products.some((product, index) => {
             if (product.id == data.id) {
@@ -14,23 +17,13 @@ export const mutations = {
                 }
             } else return false
         })  
-    },
-
-    setStock(state, {id, stock}) {
-        state.products.some((product, index) => {
-            return product.id == id ? state.products[index].stock = stock : false;
-        })
-    },
-
-    setDisplay(state, {id, display}) {
-        state.products.forEach(product => {
-            return product.id == id ? product.display = display : false
-        })
     }
-    
 }
 
 export const actions = {
+    /**
+     * 商品情報の一覧を取得
+     */
     async getProducts({commit, rootState}) {
         const response = await this.$axios({
             method: "GET",
@@ -54,7 +47,27 @@ export const actions = {
         }
     },
 
-    async setStocks({commit, rootState}, {id, data}) {
+    async createProduct({commit, rootState}, data) {
+        const response = await this.$axios({
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                ...rootState.pos.admin.auth
+            },
+            url: process.env.POS_HOST+"api/v1/products",
+            data: {
+                ...data
+            },
+            timeout: 5000
+        }).catch(err => {return false})
+
+        if (response.status == 200 && response.data.success) {
+            return await commit("addProduct", response.data.product)
+        } else return false;
+    },
+
+    async updateProduct({commit, rootState}, {id, data}) {
         const response = await this.$axios({
             method: "PUT",
             headers: {
@@ -72,7 +85,6 @@ export const actions = {
         })
 
         if (response.status == 200 && response.data.success) {
-            // await commit("setStock", {id: response.data.product.id, stock: response.data.product.stock})
             await commit("updateProduct", response.data.product)
             return true
         } else return false
