@@ -23,7 +23,11 @@
       <el-table-column prop="stock" label="現在在庫" sortable width="130"></el-table-column>
       <el-table-column prop="stock" label="変更後在庫" width="200">
         <template slot-scope="scope">
-          <el-input-number size="small" v-model="changes.stocks[scope.row.id]"></el-input-number>
+          <el-input-number
+            size="small"
+            :min="scope.row.stock"
+            v-model="changes.stocks[scope.row.id]"
+          ></el-input-number>
         </template>
       </el-table-column>
       <el-table-column prop="display" label="表示" sortable width="130">
@@ -47,9 +51,12 @@
       <div class="contents tabber-contents">
         <el-row class="middle-center">
           <el-col :span="4">
+            <el-button class="tab-button" @click="$refs.createModal.open()">商品の追加</el-button>
+          </el-col>
+          <el-col :span="4">
             <el-button class="tab-button" @click="resetList">Reset</el-button>
           </el-col>
-          <el-col :span="16">
+          <el-col :span="12">
             <div style="width:100%;height:10px;"></div>
           </el-col>
           <el-col :span="4">
@@ -59,11 +66,13 @@
       </div>
     </div>
     <div style="height:80px;"></div>
+    <create-product ref="createModal" @reset-list="resetList"/>
   </v-ons-page>
 </template>
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import CreateProduct from "~/components/admin/CreateProduct";
 export default {
   data() {
     return {
@@ -77,24 +86,8 @@ export default {
       }
     };
   },
-  computed: {
-    /**
-     * 検索にヒットした商品情報を返す
-     */
-    products() {
-      if (this.search_str == "") return this.oldProducts;
-      else {
-        let items = [];
-        this.oldProducts.forEach(product => {
-          if (product.name.indexOf(this.search_str) > -1) items.push(product);
-        });
-        return items;
-      }
-    },
-    ...mapState("pos/admin", ["user"]),
-    ...mapState("pos/admin/products-manager", {
-      oldProducts: state => state.products
-    })
+  components: {
+    CreateProduct
   },
   methods: {
     /**
@@ -108,7 +101,10 @@ export default {
             return (
               item.id == k &&
               (item.stock != this.changes.stocks[k] ||
-                item.notification != this.changes.notifications[k])
+                item.notification != this.changes.notifications[k] ||
+                item.notification_stock !=
+                  this.changes.notification_stocks[k] ||
+                item.display != this.changes.display[k])
             );
           })
         ) {
@@ -145,6 +141,25 @@ export default {
       "getProducts",
       "updateProduct"
     ])
+  },
+  computed: {
+    /**
+     * 検索にヒットした商品情報を返す
+     */
+    products() {
+      if (this.search_str == "") return this.oldProducts;
+      else {
+        let items = [];
+        this.oldProducts.forEach(product => {
+          if (product.name.indexOf(this.search_str) > -1) items.push(product);
+        });
+        return items;
+      }
+    },
+    ...mapState("pos/admin", ["user"]),
+    ...mapState("pos/admin/products-manager", {
+      oldProducts: state => state.products
+    })
   },
   async mounted() {
     if (await this.getProducts()) {

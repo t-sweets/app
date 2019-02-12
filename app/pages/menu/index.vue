@@ -63,7 +63,8 @@ export default {
           size: "big",
           icon: ["fas", "cash-register"],
           description: "Sweetsのお会計画面はこちら",
-          openPage: () => {
+          openPage: async () => {
+            await this.getProducts();
             this.$emit("push-page", pos);
           }
         },
@@ -111,6 +112,7 @@ export default {
         });
       }
     },
+    ...mapActions("pos", ["getProducts"]),
     ...mapActions("pos/admin", ["loginAdmin"])
   }
 };

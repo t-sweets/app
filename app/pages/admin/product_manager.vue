@@ -18,27 +18,28 @@
       :default-sort="{prop: 'id', order: 'ascending'}"
       style="width: 100%"
     >
-      <el-table-column prop="name" label="Name"></el-table-column>
-      <el-table-column prop="price" label="販売価格" sortable width="150"></el-table-column>
+      <el-table-column prop="name" label="商品名"></el-table-column>
+      <el-table-column prop="price" label="販売価格" sortable width="100"></el-table-column>
+      <el-table-column prop="cost" label="原価" sortable width="100"></el-table-column>
       <el-table-column prop="stock" label="現在在庫/変更後在庫" sortable width="250">
         <template slot-scope="scope">
-          <span class="table-label">{{scope.row.stock}}</span>
+          <span class="table-label">{{scope.row.stock}}</span>/
           <el-input-number size="small" v-model="changes.stocks[scope.row.id]"></el-input-number>
         </template>
       </el-table-column>
-      <el-table-column prop="display" label="表示" sortable width="100">
-        <template slot-scope="scope">
-          <v-ons-switch v-model="changes.display[scope.row.id]"></v-ons-switch>
-        </template>
-      </el-table-column>
-      <el-table-column prop="notification" label="在庫通知/通知個数" width="200">
+      <el-table-column prop="notification" label="在庫通知/通知個数" width="210">
         <template slot-scope="scope">
           <v-ons-switch
             v-model="changes.notifications[scope.row.id]"
             active-color="#13ce66"
             style="vertical-align:middle;"
-          ></v-ons-switch>
+          ></v-ons-switch>/
           <el-input-number size="small" v-model="changes.notification_stocks[scope.row.id]"></el-input-number>
+        </template>
+      </el-table-column>
+      <el-table-column prop="display" label="表示" sortable width="100">
+        <template slot-scope="scope">
+          <v-ons-switch v-model="changes.display[scope.row.id]"></v-ons-switch>
         </template>
       </el-table-column>
       <el-table-column width="10">
@@ -70,7 +71,7 @@
     </div>
     <div style="height:80px;"></div>
 
-    <create-product ref="createModal"/>
+    <create-product ref="createModal" @reset-list="resetList"/>
   </v-ons-page>
 </template>
 
@@ -105,7 +106,10 @@ export default {
             return (
               item.id == k &&
               (item.stock != this.changes.stocks[k] ||
-                item.notification != this.changes.notifications[k])
+                item.notification != this.changes.notifications[k] ||
+                item.notification_stock !=
+                  this.changes.notification_stocks[k] ||
+                item.display != this.changes.display[k])
             );
           })
         ) {

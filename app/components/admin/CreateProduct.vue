@@ -24,7 +24,7 @@
               :show-file-list="false"
               :before-upload="convertToBase64"
             >
-              <img v-if="form.image" :src="form.image" class="product-image">
+              <img v-if="form.image" :src="toImageData" class="product-image">
               <i v-else class="el-icon-plus product-image-uploader-icon"></i>
             </el-upload>
           </el-col>
@@ -80,18 +80,24 @@ export default {
       this.$refs.createProduct.open();
     },
     async close() {
-      await this.createProduct(form);
+      await this.createProduct(this.form);
+      this.$emit("reset-list");
       this.$refs.createProduct.close();
     },
     convertToBase64(file) {
       let fr = new FileReader();
       fr.onload = evt => {
-        this.form.image = evt.target.result;
+        this.form.image = evt.target.result.split("base64,")[1];
         this.form.image_path = file.name;
       };
       fr.readAsDataURL(file);
     },
     ...mapActions("pos/admin/products-manager", ["createProduct"])
+  },
+  computed: {
+    toImageData() {
+      return this.form.image ? "data:image/png;base64," + this.form.image : "";
+    }
   }
 };
 </script>
