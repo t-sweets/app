@@ -53,16 +53,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.el-input-number {
-  width: 100%;
-  .el-input-number__decrease,
-  .el-input-number__increase {
-    width: 80px;
-  }
-}
-</style>
-
 <style lang="scss" scoped>
 .selected {
   position: relative;
