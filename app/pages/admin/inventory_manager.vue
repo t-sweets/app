@@ -108,7 +108,7 @@ export default {
             return (
               item.id == k &&
               (item.stock != this.changes.stocks[k] ||
-                item.notification != this.changes.notification[k])
+                item.notification != this.changes.notifications[k])
             );
           })
         ) {
