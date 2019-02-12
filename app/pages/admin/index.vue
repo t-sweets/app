@@ -6,7 +6,7 @@
       </div>
       <div class="center">POS管理ページ</div>
       <div class="right">
-        <span>{{ user.name }}</span>
+        <span class="user-name">{{ user.name }}</span>
       </div>
     </v-ons-toolbar>
 
@@ -27,6 +27,7 @@ import MenuButton from "~/components/admin/MenuButton";
 
 import product_manager from "~/pages/admin/product_manager";
 import inventory_manager from "~/pages/admin/inventory_manager";
+import user_manager from "~/pages/admin/user_manager";
 
 import { mapState, mapActions } from "vuex";
 
@@ -61,6 +62,13 @@ export default {
           title: "売上",
           description: "日別売上、商品別売上など",
           icon: ["fas", "chart-line"],
+          authory: [1]
+        },
+        {
+          title: "ユーザ管理",
+          description: "販売員登録、権限情報変更など",
+          icon: ["fas", "users"],
+          page: user_manager,
           authory: [1]
         }
       ]
@@ -114,10 +122,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .toolbar {
   .right {
-    > * {
+    > span.user-name {
       margin-right: 10px;
     }
   }
