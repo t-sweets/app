@@ -14,4 +14,5 @@ COPY package-lock.json $APP_ROOT
 RUN npm install && \
     npm cache verify
 
+ENV HOST 0.0.0.0
 EXPOSE 13000
