@@ -38,13 +38,15 @@ export default {
     return {
       isPause: false,
       tpay_method: "felica",
-      testURL: "http://www.google.com"
+      testURL: "http://www.google.com",
+      reader_timeout: 0
     };
   },
   methods: {
     changeMethod() {
       if (this.tpay_method == "felica") {
         this.tpay_method = "qr";
+        this.stopCardReader();
       } else {
         this.tpay_method = "felica";
         this.preparePayment();
@@ -54,15 +56,23 @@ export default {
       this.$emit("reSelect");
     },
     /*
-     ** カードリーダーを起動する
+     ** Start Card Reader
      */
-    preparePayment() {
-      if (!this.isReading) {
-        //決済端末を起動
-        this.execCardReader(["Payment Price", this.totalPrice]);
-      } else {
-        // 起動済みなら、メッセージの書き換えのみ
-        this.showMessage(["Payment Price", this.totalPrice]);
+    async preparePayment() {
+      this.reader_timeout = 30000;
+      await this.startCardReader(); // フラグを立てる
+      await this.showMessage(["Payment Price", this.totalPrice]);
+
+      while (this.isReading && this.reader_timeout > -1) {
+        const response = await this.execCardReader();
+        this.reader_timeout--;
+        if (response == true) {
+          // IDを取得後、決済開始
+          this.recognization();
+          break;
+        } else if (response == null) {
+          this.$ons.notification.alert("CardReader Error!");
+        }
       }
     },
     /*
@@ -89,7 +99,12 @@ export default {
       }
     },
     ...mapActions("pos/purchase", ["purchaseCreate"]),
-    ...mapActions("t-pay/card-reader", ["execCardReader", "showMessage"])
+    ...mapActions("t-pay/card-reader", [
+      "startCardReader",
+      "stopCardReader",
+      "execCardReader",
+      "showMessage"
+    ])
   },
   computed: {
     changeMethodText() {
@@ -118,12 +133,7 @@ export default {
 
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"]),
-    ...mapState("t-pay/card-reader", [
-      "displayText",
-      "idm",
-      "isPayment",
-      "readingTimeout"
-    ])
+    ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
   },
   created() {
     this.preparePayment();
