@@ -15,7 +15,7 @@
             <p class="form-text" v-if="isConfirm">{{ form.email }}</p>
           </el-form-item>
           <div v-if="isSelf || isNew">
-            <el-form-item label="password" prop="password">
+            <el-form-item :label="passwordLabel" prop="password">
               <el-input
                 type="password"
                 v-model="form.password"
@@ -221,6 +221,9 @@ export default {
     },
     title() {
       return this.isNew ? "ユーザー情報登録" : "ユーザー情報更新";
+    },
+    passwordLabel() {
+      return this.isNew ? "password" : "new password";
     },
     hidePassword() {
       let str = "";

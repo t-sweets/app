@@ -5,6 +5,7 @@ export const state = () => ({
         uid: null
     },
     user: {
+        id: -1,
         name: null,
         authority: null,    // 1:admin, 2:pos, 3:arriver
     },
@@ -18,8 +19,9 @@ export const mutations = {
             uid: uid
         }
     },
-    setAdminData(state, {name, authority}) {
+    setAdminData(state, {id, name, authority}) {
         state.user = {
+            id: id,
             name: name,
             authority: authority
         }
@@ -52,6 +54,7 @@ export const actions = {
             });
 
             await commit("setAdminData", {
+                id: response.data.data.id,
                 name: response.data.data.name,
                 authority: response.data.data.authority_id
             });
