@@ -17,7 +17,7 @@
     <div class="products" v-show="!paymethod">
       <el-row class="contents" v-for="item in items" :key="item.id">
         <el-col class="image" :span="7">
-          <img :src="item.image_path" alt>
+          <img :src="toImageUrl(item.image_path)" alt>
         </el-col>
         <el-col :span="16">
           <div class="middle-center">
@@ -89,6 +89,13 @@ export default {
     },
     pushSuccess() {
       this.$emit("pushSuccess");
+    },
+    toImageUrl(path) {
+      return path.match(
+        /^(https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/
+      )
+        ? path
+        : process.env.POS_HOST + "product_images/" + path;
     }
   },
   components: {

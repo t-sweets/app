@@ -6,7 +6,7 @@
       :class="{selected: isSelected}"
       :align="styles"
     >
-      <img :src="product.image_path" class="image">
+      <img :src="toImageUrl" class="image">
       <div style="padding: 14px;">
         <span>{{ product.name }}</span>
         <div class="bottom clearfix">
@@ -48,6 +48,13 @@ export default {
     },
     isSelected() {
       return this.quantity > 0;
+    },
+    toImageUrl() {
+      return this.product.image_path.match(
+        /^(https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/
+      )
+        ? this.product.image_path
+        : process.env.POS_HOST + "product_images/" + this.product.image_path;
     }
   }
 };
@@ -78,6 +85,7 @@ export default {
   }
 }
 .product-card {
+  height: 350px;
   .price {
     font-size: 13px;
     color: #999;
