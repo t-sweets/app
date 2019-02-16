@@ -46,12 +46,16 @@ export default {
         }
       });
     },
-    ...mapActions("pos", ["initialize", "getProducts"]),
+    ...mapActions("pos", ["initialize", "getAuthorities", "getProducts"]),
     ...mapActions("pos/payment-method", ["getPaymentMethod"])
   },
   async mounted() {
+    /**
+     * 起動シークエンス
+     */
     const initializeMethods = [
       this.initialize,
+      this.getAuthorities,
       this.getProducts,
       this.getPaymentMethod
     ];
@@ -72,9 +76,12 @@ export default {
             message = "POS端末の認証にエラーが発生しました";
             break;
           case 1:
-            message = "商品情報を取得できませんでした";
+            message = "権限情報を取得できませんでした";
             break;
           case 2:
+            message = "商品情報を取得できませんでした";
+            break;
+          case 3:
             message = "決済情報を取得できませんでした";
             break;
           default:
