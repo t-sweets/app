@@ -16,12 +16,12 @@
       <el-table-column prop="authority_id" label="authority" sortable>
         <template slot-scope="scope">{{toAuthStr(scope.row.authority_id)}}</template>
       </el-table-column>
-      <el-table-column label="Edit" width="100">
+      <el-table-column label="Edit" width="80">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="preEdit(scope.row.id)" plain>編集</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="Del" width="100">
+      <el-table-column label="Del" width="80">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="preDelete(scope.row.id)" plain>削除</el-button>
         </template>
