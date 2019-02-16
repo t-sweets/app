@@ -38,9 +38,6 @@ import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      isShowTotal: false,
-      selectedMethod: null,
-
       menuList: [
         {
           title: "商品一覧",
@@ -66,7 +63,7 @@ export default {
           title: "売上",
           description: "日別売上、商品別売上など",
           icon: ["fas", "chart-line"],
-          authoriy: [1]
+          authority: [1]
         },
         {
           title: "ユーザ管理",
@@ -80,7 +77,7 @@ export default {
           description: "パスワードの変更など",
           icon: ["fas", "cogs"],
           click: () => {
-            this.$refs.myDataEdit.open(this.user.id);
+            this.editModal();
           },
           authority: [1, 2, 3, 4]
         }
@@ -92,15 +89,8 @@ export default {
     EditUserModal
   },
   methods: {
-    /*
-     ** 関数から決済パネルの表示非表示を定める
-     */
-    showTotal(bool) {
-      this.isShowTotal = bool;
-    },
-    selectMethod(method) {
-      this.selectedMethod = method;
-      this.showTotal(true);
+    editModal() {
+      this.$refs.myDataEdit.open(this.user.id);
     },
     pushButton(menu) {
       if (menu.page) {
@@ -138,8 +128,7 @@ export default {
     },
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/admin", ["user"])
-  },
-  async created() {}
+  }
 };
 </script>
 
