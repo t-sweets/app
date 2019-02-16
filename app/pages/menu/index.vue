@@ -41,6 +41,17 @@
         </el-footer>
       </el-container>
     </sweet-modal>
+    <sweet-modal
+      overlay-theme="dark"
+      icon="error"
+      ref="errorModal"
+      title="Login Error..."
+    >ログインに失敗しました
+      <sweet-button slot="button">
+        <el-button type="primary" @click="$refs.errorModal.close(),$refs.modal.open()">再試行</el-button>
+        <el-button @click="$refs.errorModal.close()">Done</el-button>
+      </sweet-button>
+    </sweet-modal>
   </v-ons-page>
 </template>
 
@@ -94,14 +105,16 @@ export default {
     },
     async pushLogin() {
       if (this.login.email && this.login.password) {
+        this.$refs.modal.close();
         if (
           await this.loginAdmin({
             email: this.login.email,
             password: this.login.password
           })
         ) {
-          this.$refs.modal.close();
           this.$emit("push-page", adminPage);
+        } else {
+          this.$refs.errorModal.open();
         }
       } else {
         this.$ons.notification.alert({

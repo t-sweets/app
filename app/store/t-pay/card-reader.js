@@ -16,45 +16,53 @@ export const mutations = {
         state.idm = idm
     },
 
-    setStatus(state, bool) {
+    setReading(state, bool) {
         state.isReading = bool
     }
 }
 
 export const actions = {
-    async execCardReader({commit, state}, texts) {
-
-        commit("setStatus", true)
-        commit("setText", {line_1: texts[0] ? texts[0] : "", line_2: texts[1] ? texts[1] : "" })
-
+    async startCardReader({commit, state}) {
+        await commit("setReading", true);
+    },
+    async stopCardReader({commit, state}) {
+        await commit("setReading", false);
+    },
+    /**
+     * カードリーダを起動
+     */
+    async execCardReader({commit, state}) {
+        
         const response = await this.$axios({
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8",
                 "Access-Control-Allow-Origin": "*",
                 // ...this.$store.state.auth
             },
-            url: "http://192.168.133.140:8000/api/v1/card_read/",
-            data: {
-                "message": state.displayText
-            },
-            timeout : 30000,
+            url: process.env.IDM_READER_HOST + "api/v1/card",
+            timeout : 3000,
         }).catch(err => {
-            commit("setStatus", false)
-            if (err.indexOf('timeout') < -1)
-            return false
+            commit("setReading", false)
+            return null
         })
 
-        if (response.status == 201) {
-            commit("setIDM", response.data.idm)
-            commit("setStatus", false)
+        if (response.status == 200) {
+            await commit("setIDM", response.data.idm)
+            await commit("setReading", false)
             return true
-        } else {
-            commit("setStatus", false)
+        } else if (!state.isReading && response.status == 204 ) {
             return false
+        } else {
+            await commit("setReading", false)
+            return null
         }
     },
 
+
+    /**
+     * カードリーダのモニタへメッセージを表示
+     */
     async showMessage({commit, state}, texts) {
 
         commit("setText", {line_1: texts[0] ? texts[0] : "", line_2: texts[1] ? texts[1] : "" })
@@ -66,7 +74,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 // ...this.$store.state.auth
             },
-            url: "http://192.168.133.140:8000/api/v1/message/",
+            url: process.env.IDM_READER_HOST + "api/v1/message",
             data: state.displayText,
             timeout : 3000,
         }).catch(err => {

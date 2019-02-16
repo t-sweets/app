@@ -1,8 +1,4 @@
-const host = process.env.POS_HOST;
-
 export const state = () => ({
-
-    host: host,
     auth: {
         "access-token": null,
         "client": null,
@@ -10,6 +6,7 @@ export const state = () => ({
     },
     products: [],
 
+    authority_index: {},
 
 
     products1: [
@@ -101,6 +98,13 @@ export const mutations = {
     setProducts(state, products) {
         state.products = products;
     },
+    setAuthorities(state, datas) {
+        datas.forEach(data => {
+            state.authority_index[data.id] = {
+                ...data
+            }
+        });
+    }
 }
 
 export const actions = {
@@ -118,7 +122,7 @@ export const actions = {
                 email: process.env.POS_AUTH_EMAIL,
                 password: process.env.POS_AUTH_PASSWORD
             },
-            url: "http://localhost:3000/api/v1/auth/sign_in"
+            url: process.env.POS_HOST + "api/v1/auth/sign_in"
         })
         .catch(err => {
             return false
@@ -137,6 +141,31 @@ export const actions = {
         }
 
     },
+    /**
+     * 権限一覧の取得
+     */
+    async getAuthorities({commit, state}) {
+        const response = await this.$axios({
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                ...state.auth
+            },
+            url: process.env.POS_HOST +"api/v1/authorities",
+            timeout: 1000
+        })
+        .catch(err => {
+            return false
+        });
+
+        if (response.status == 200) {
+            commit("setAuthorities", response.data)
+            return true
+        } else {
+            return false
+        }
+    },
     async getProducts({ commit, state }) {
         const response = await this.$axios({
             method: "GET",
@@ -145,7 +174,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...state.auth
             },
-            url: "http://localhost:3000/api/v1/products",
+            url: process.env.POS_HOST +"api/v1/products",
             timeout: 3000
         })
         .catch(err => {
