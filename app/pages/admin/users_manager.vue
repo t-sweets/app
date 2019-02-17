@@ -105,7 +105,7 @@ export default {
     } else {
       this.$ons.notification.alert({
         title: "通信エラー",
-        message: "商品リストを取得できませんでした"
+        message: "ユーザ情報を取得できませんでした"
       });
     }
   }

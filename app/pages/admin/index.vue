@@ -18,7 +18,7 @@
       </el-col>
     </el-row>
 
-    <edit-user-modal :isSelf="true" ref="myDataEdit"/>
+    <edit-user-modal :isSelf="true" ref="myDataEdit" @logout="execLogout()"/>
   </v-ons-page>
 </template>
 
@@ -29,8 +29,7 @@ import MenuButton from "~/components/admin/MenuButton";
 import EditUserModal from "~/components/admin/EditUserModal";
 
 import product_manager from "~/pages/admin/product_manager";
-import inventory_manager from "~/pages/admin/inventory_manager";
-
+import arrival_process from "~/pages/admin/arrival_process";
 import users_manager from "~/pages/admin/users_manager";
 
 import { mapState, mapActions } from "vuex";
@@ -40,37 +39,37 @@ export default {
     return {
       menuList: [
         {
-          title: "商品一覧",
+          title: "商品管理",
           description: "商品情報などの設定",
           icon: ["fas", "tag"],
           page: product_manager,
-          authority: [1]
+          authority: ["admin", "inventoryer"]
         },
         {
-          title: "在庫管理",
-          description: "在庫や、表示/非表示の管理",
+          title: "入荷業務",
+          description: "商品入荷の登録や、売価の変更",
           icon: ["fas", "yen-sign"],
-          page: inventory_manager,
-          authority: [1, 3]
+          page: arrival_process,
+          authority: ["admin", "inventoryer", "arriver"]
         },
         {
           title: "点検・生産",
           description: "入出金、レジチェックなど",
           icon: ["fas", "money-check-alt"],
-          authority: [1]
+          authority: ["admin"]
         },
         {
           title: "売上",
           description: "日別売上、商品別売上など",
           icon: ["fas", "chart-line"],
-          authority: [1]
+          authority: ["admin", "inventoryer", "arriver"]
         },
         {
           title: "ユーザ管理",
           description: "販売員情報の閲覧・変更など",
           icon: ["fas", "users"],
           page: users_manager,
-          authority: [1]
+          authority: ["admin"]
         },
         {
           title: "個人設定",
@@ -79,7 +78,7 @@ export default {
           click: () => {
             this.editModal();
           },
-          authority: [1, 2, 3, 4]
+          authority: ["admin", "pos", "inventoryer", "arriver"]
         }
       ]
     };
@@ -108,10 +107,13 @@ export default {
         })
         .then(index => {
           if (index == 1) {
-            this.logout();
-            this.$emit("pop-page", menu);
+            this.execLogout();
           }
         });
+    },
+    execLogout() {
+      this.logout();
+      this.$emit("pop-page", menu);
     },
     ...mapActions("pos/payment-method", ["getPaymentMethod"]),
     ...mapActions("pos/admin", ["logout"])
@@ -120,12 +122,17 @@ export default {
     menus() {
       let menus = [];
       this.menuList.forEach(menu => {
-        if (menu.authority.includes(this.user.authority)) {
+        if (
+          menu.authority.includes(
+            this.authority_index[this.user.authority].name
+          )
+        ) {
           menus.push(menu);
         }
       });
       return menus;
     },
+    ...mapState("pos", ["authority_index"]),
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/admin", ["user"])
   }

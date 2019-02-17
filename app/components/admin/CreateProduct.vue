@@ -35,18 +35,21 @@
           </el-col>
         </el-form-item>
         <el-form-item label="在庫通知/通知個数">
-          <el-col :span="5">
-            <el-switch v-model="form.notification"></el-switch>
+          <el-col :span="8">
+            <el-switch active-text="通知する" inactive-text="通知しない" v-model="form.notification"></el-switch>
           </el-col>
           <el-col class="line" :span="2">/</el-col>
           <el-col :span="11">
-            <el-input-number v-model="form.notification_stock" :min="0" :max="99"></el-input-number>
+            <el-input-number
+              v-model="form.notification_stock"
+              :min="0"
+              :max="99"
+              :disabled="!form.notification"
+            ></el-input-number>
           </el-col>
         </el-form-item>
         <el-form-item label="表示">
-          <el-col :span="5">
-            <el-switch v-model="form.display"></el-switch>
-          </el-col>
+          <el-switch v-model="form.display" active-text="表示する" inactive-text="表示しない"></el-switch>
         </el-form-item>
       </el-form>
     </div>
@@ -64,8 +67,8 @@ export default {
     return {
       form: {
         name: "",
-        price: 0,
-        cost: 0,
+        price: 100,
+        cost: 100,
         stock: 0,
         display: true,
         image_path: null,
