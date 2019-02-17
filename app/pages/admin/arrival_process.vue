@@ -4,7 +4,7 @@
       <div class="left">
         <v-ons-back-button></v-ons-back-button>
       </div>
-      <div class="center">商品管理</div>
+      <div class="center">入荷業務</div>
       <div class="right">
         <span class="user-name">{{ user.name }}</span>
       </div>
@@ -21,27 +21,25 @@
       <el-table-column prop="name" label="商品名"></el-table-column>
       <el-table-column prop="price" label="販売価格" sortable width="100"></el-table-column>
       <el-table-column prop="cost" label="原価" sortable width="100"></el-table-column>
-      <el-table-column prop="stock" label="在庫" sortable width="250"></el-table-column>
-      <el-table-column prop="notification" label="在庫通知/通知個数" width="210">
+      <el-table-column prop="stock" label="在庫数" sortable width="100"></el-table-column>
+      <el-table-column prop="notification" label="在庫通知" width="160">
         <template slot-scope="scope">
-          <v-ons-switch
-            v-model="changes.notifications[scope.row.id]"
-            active-color="#13ce66"
-            style="vertical-align:middle;"
-          ></v-ons-switch>/
-          <el-input-number size="small" v-model="changes.notification_stocks[scope.row.id]"></el-input-number>
+          <p>{{toNotificationStr(scope.row.notification, scope.row.notification_stock)}}</p>
         </template>
       </el-table-column>
       <el-table-column prop="display" label="表示" sortable width="100">
         <template slot-scope="scope">
-          <v-ons-switch v-model="changes.display[scope.row.id]"></v-ons-switch>
+          <p>{{ toDisplay(scope.row.display) }}</p>
         </template>
       </el-table-column>
-      <el-table-column width="10">
+      <el-table-column label="入荷" width="100">
         <template slot-scope="scope">
-          <el-button type="text">
-            <font-awesome-icon :icon="['fas', 'adjust']"/>
-          </el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            plain
+            @click="$refs.arrivalModal.open(scope.row.id)"
+          >入荷作業</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,98 +50,43 @@
           <el-col :span="4">
             <el-button class="tab-button" @click="$refs.createModal.open()">商品の追加</el-button>
           </el-col>
-          <el-col :span="4">
-            <el-button class="tab-button" @click="resetList">Reset</el-button>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="20">
             <div style="width:100%;height:10px;"></div>
-          </el-col>
-          <el-col :span="4">
-            <el-button class="tab-button" type="primary" @click="updateProducts">保存する</el-button>
           </el-col>
         </el-row>
       </div>
     </div>
     <div style="height:80px;"></div>
 
-    <create-product ref="createModal" @reset-list="resetList"/>
+    <arrival-product ref="arrivalModal"/>
+    <create-product ref="createModal"/>
   </v-ons-page>
 </template>
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+
 import CreateProduct from "~/components/admin/CreateProduct";
+import ArrivalProduct from "~/components/admin/ArrivalProduct";
+
 export default {
   data() {
     return {
-      search_str: "",
-      display: true,
-      changes: {
-        stocks: {},
-        notifications: {},
-        notification_stocks: {},
-        display: {}
-      }
+      search_str: ""
     };
   },
   components: {
-    CreateProduct
+    CreateProduct,
+    ArrivalProduct
   },
   methods: {
-    /**
-     * 在庫数UPDATE
-     */
-    async updateProducts() {
-      let isSuccess = false;
-      for (let k in this.changes.stocks) {
-        if (
-          this.products.some(item => {
-            return (
-              item.id == k &&
-              (item.stock != this.changes.stocks[k] ||
-                item.notification != this.changes.notifications[k] ||
-                item.notification_stock !=
-                  this.changes.notification_stocks[k] ||
-                item.display != this.changes.display[k])
-            );
-          })
-        ) {
-          if (
-            await this.updateProduct({
-              id: k,
-              data: {
-                stock: this.changes.stocks[k],
-                notification: this.changes.notifications[k],
-                notification_stock: this.changes.notification_stocks[k],
-                display: this.changes.display[k]
-              }
-            })
-          ) {
-            this.$notify({
-              title: "Success",
-              message: "商品在庫を更新しました",
-              type: "success",
-              duration: 3000
-            });
-          }
-        }
-      }
+    toNotificationStr(bool, num) {
+      return bool ? num + "個以下で通知" : "通知しない";
     },
-    /**
-     * 情報を更新前にリセット
-     */
-    resetList() {
-      this.oldProducts.forEach(item => {
-        this.changes.stocks[item.id] = item.stock;
-        this.changes.notifications[item.id] = item.notification;
-        this.changes.notification_stocks[item.id] = item.notification_stock;
-        this.changes.display[item.id] = item.display;
-      });
+    toDisplay(bool) {
+      return bool ? "true" : "false";
     },
-    ...mapActions("pos/admin/products-manager", [
-      "getProducts",
-      "updateProduct"
-    ])
+    ...mapActions("pos/admin/products-manager", ["getProducts"])
   },
   computed: {
     /**
@@ -166,7 +109,6 @@ export default {
   },
   async mounted() {
     if (await this.getProducts()) {
-      await this.resetList();
     } else {
       this.$ons.notification.alert({
         title: "通信エラー",

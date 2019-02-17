@@ -62,7 +62,7 @@ export const actions = {
             return false
         });
 
-        if (response.status == 200 && response.data.success) {
+        if (response.status == 200 && response.data.status == "success") {
             await commit("createUser", response.data.data)
             return true
         } else {
@@ -74,7 +74,8 @@ export const actions = {
      * update user datas
      * @param {*} data update datas
      */
-    async updateUser({commit, rootState}, data) {
+    async updateUser({commit, rootState}, {id, data}) {
+        if (Object.keys(data).length === 0) return true;
         const response = await this.$axios({
             method: "PUT",
             headers: {
@@ -84,6 +85,7 @@ export const actions = {
             },
             url: process.env.POS_HOST+"api/v1/auth",
             data: {
+                id: id,
                 ...data
             },
             timeout: 3000

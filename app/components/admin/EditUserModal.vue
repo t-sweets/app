@@ -46,6 +46,13 @@
             </el-select>
             <p class="form-text" v-if="isConfirm">{{ authorityName }}</p>
           </el-form-item>
+          <el-form-item>
+            <p
+              class="form-text"
+              v-if="isConfirm && isSelf"
+              style="color:red;"
+            >パスワードを変更すると、一度ログアウトされます</p>
+          </el-form-item>
         </el-form>
       </div>
       <sweet-button slot="button">
@@ -60,13 +67,14 @@
     <sweet-modal ref="successModal" icon="success">
       <div style="margin: 20px;">ユーザ情報を更新しました</div>
       <div class="buttons">
-        <el-button type="primary" @click="$refs.successModal.close()">完了</el-button>
+        <el-button type="primary" @click="postUpdate">完了</el-button>
       </div>
     </sweet-modal>
   </div>
 </template>
 
 <script>
+import menu from "~/pages/menu/";
 import { mapState, mapActions } from "vuex";
 export default {
   data() {
@@ -153,6 +161,11 @@ export default {
           checkpass: "",
           authority_id: 4
         };
+      } else if (this.isSelf) {
+        this.form.id = this.user.id;
+        this.form.name = this.user.name;
+        this.form.email = this.user.email;
+        this.form.authority_id = this.user.authority;
       } else {
         this.isNew = false;
         this.users.some(user => {
@@ -198,22 +211,29 @@ export default {
       this.close();
       const n = this.form,
         o = this.editUser;
-      let data = {
-        id: n.id
-      };
+      let data = {};
       if (o.name != n.name) data.name = n.name;
       if (o.email != n.email) data.email = n.email;
       if (o.password != n.password) data.password = n.password;
       if (o.authority_id != n.authority_id) data.authority_id = n.authority_id;
 
-      if (await this.updateUser(data)) {
+      if (await this.updateUser({ id: o.id, data: data })) {
         this.$refs.successModal.open();
       } else {
         this.$ons.notification.alert("更新に失敗しました");
       }
     },
-
-    ...mapActions("pos/admin/users-manager", ["createUser", "updateUser"])
+    postUpdate() {
+      this.$refs.successModal.close();
+      if (this.isSelf) {
+        this.$emit("logout");
+      }
+    },
+    ...mapActions("pos/admin/users-manager", [
+      "createUser",
+      "getUsers",
+      "updateUser"
+    ])
   },
   computed: {
     authorityName() {
@@ -233,6 +253,7 @@ export default {
       return str;
     },
     ...mapState("pos", ["authority_index"]),
+    ...mapState("pos/admin", ["user"]),
     ...mapState("pos/admin/users-manager", ["users"])
   },
   props: ["isSelf", "isAdmin"]
