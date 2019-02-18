@@ -162,18 +162,20 @@ export default {
           authority_id: 4
         };
       } else if (this.isSelf) {
-        this.form.id = this.user.id;
-        this.form.name = this.user.name;
-        this.form.email = this.user.email;
-        this.form.authority_id = this.user.authority;
+        this.editUser = this.user;
+        this.form.id = this.editUser.id;
+        this.form.name = this.editUser.name;
+        this.form.email = this.editUser.email;
+        this.form.authority_id = this.editUser.authority;
       } else {
         this.isNew = false;
         this.users.some(user => {
           return user.id == id ? (this.editUser = user) : false;
         });
-        this.form = {
-          ...this.editUser
-        };
+        this.form.id = this.editUser.id;
+        this.form.name = this.editUser.name;
+        this.form.email = this.editUser.email;
+        this.form.authority_id = this.editUser.authority;
       }
       this.isConfirm = false;
       this.$refs.editUser.open();

@@ -101,6 +101,10 @@ export default {
   },
   methods: {
     openLoginPrompt() {
+      this.login = {
+        email: null,
+        password: null
+      };
       this.$refs.modal.open();
     },
     async pushLogin() {
