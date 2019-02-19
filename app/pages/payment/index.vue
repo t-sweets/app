@@ -8,7 +8,16 @@
     </v-ons-toolbar>
     <v-ons-search-input placeholder="商品を検索" v-model="search_str"></v-ons-search-input>
     <el-row>
-      <el-col :span="5" v-for="product in search" :key="product.id" :offset="0">
+      <el-col
+        :xs="11"
+        :sm="7"
+        :md="5"
+        :lg="8"
+        :xl="5"
+        v-for="product in search"
+        :key="product.id"
+        :offset="0"
+      >
         <products ref="prod" :product="product" @addCart="addCart"/>
       </el-col>
     </el-row>

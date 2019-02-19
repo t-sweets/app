@@ -8,7 +8,7 @@
     >
       <img :src="toImageUrl" class="image">
       <div style="padding: 14px;">
-        <span>{{ product.name }}</span>
+        <span class="title">{{ product.name }}</span>
         <div class="bottom clearfix">
           <time class="price">&yen; {{ product.price }}</time>
         </div>
@@ -85,14 +85,42 @@ export default {
   }
 }
 .product-card {
-  height: 350px;
+  @include pc {
+    height: 350px;
+  }
+  @include tab {
+    height: 300px;
+  }
+  @include sp {
+    height: 300px;
+  }
+  .title {
+    @include pc {
+      font-size: 25px;
+    }
+    @include tab {
+      font-size: 23px;
+    }
+    @include sp {
+      font-size: 18px;
+    }
+  }
   .price {
-    font-size: 13px;
+    font-size: 20px;
     color: #999;
   }
   .image {
     width: 100%;
     display: block;
+    @include pc {
+      max-height: 250px;
+    }
+    @include tab {
+      max-height: 200px;
+    }
+    @include sp {
+      max-height: 180px;
+    }
   }
   .bottom {
     margin-top: 13px;
