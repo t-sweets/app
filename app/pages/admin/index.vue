@@ -11,7 +11,16 @@
     </v-ons-toolbar>
 
     <el-row>
-      <el-col :span="8" v-for="menu in menus" :key="menu.id" :offset="0">
+      <el-col
+        :xs="12"
+        :sm="12"
+        :md="8"
+        :lg="6"
+        :xl="6"
+        v-for="menu in menus"
+        :key="menu.id"
+        :offset="0"
+      >
         <div @click="pushButton(menu)">
           <menu-button ref="prod" :menu="menu"/>
         </div>
