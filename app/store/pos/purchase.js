@@ -1,5 +1,3 @@
-import { totalmem } from "os";
-
 export const state = () => ({
     uuid: null,
     cart: []
@@ -55,7 +53,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: "http://localhost:3000/api/v1/purchases/check",
+            url: process.env.POS_HOST + "api/v1/purchases/check",
             data: {
                 products: products
             },
@@ -87,7 +85,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: "http://localhost:3000/api/v1/purchases",
+            url: process.env.POS_HOST + "api/v1/purchases",
             data: {
                 products: products,
                 payment_method_id: data.id,
@@ -115,6 +113,7 @@ export const actions = {
                 url: "https://slack.com/api/chat.postMessage",
                 headers: {
                     "Content-Type": "application/json;charset=UTF-8",
+                    "Access-Control-Allow-Origin": "*",
                     "Authorization": "Bearer " + process.env.SLACK_RECEIPT_API_TOKEN
                 },
                 data: {

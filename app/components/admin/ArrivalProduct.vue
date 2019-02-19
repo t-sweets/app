@@ -56,8 +56,8 @@
                 :show-file-list="false"
                 :before-upload="convertToBase64"
               >
-                <img v-if="!isChangedImage" :src="toImageUrl" class="product-image">
-                <img v-if="isChangedImage" :src="toImageData" class="product-image">
+                <img v-if="!isChangedImage" :src="toImageUrl" class="product-image in-arrival">
+                <img v-if="isChangedImage" :src="toImageData" class="product-image in-arrival">
                 <i class="el-icon-plus product-image-uploader-icon"></i>
               </el-upload>
             </el-col>
@@ -271,7 +271,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .product-image-uploader {
   .el-upload {
     border: 1px dashed #d9d9d9;
@@ -292,10 +292,12 @@ export default {
     text-align: center;
   }
   .product-image {
-    position: absolute;
     width: 178px;
     height: 178px;
     display: block;
+    &.in-arrival {
+      position: absolute;
+    }
   }
 }
 .product-confirm-image {
