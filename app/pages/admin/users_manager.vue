@@ -23,7 +23,13 @@
       </el-table-column>
       <el-table-column label="Del" width="80">
         <template slot-scope="scope">
-          <el-button type="danger" size="mini" @click="preDelete(scope.row.id)" plain>削除</el-button>
+          <el-button
+            v-if="scope.row.id != user.id"
+            type="danger"
+            size="mini"
+            @click="preDelete(scope.row.id)"
+            plain
+          >削除</el-button>
         </template>
       </el-table-column>
     </el-table>

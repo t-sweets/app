@@ -112,6 +112,8 @@ export const actions = {
         if (response.status == 200 && response.data.success) {
             await commit("deleteProduct", response.data.data.id)
             return true
-        } else return false
+        } else if (response.status == 204) {
+            return false
+        } else return false;
     },
 }
