@@ -39,6 +39,7 @@ import EditUserModal from "~/components/admin/EditUserModal";
 
 import product_manager from "~/pages/admin/product_manager";
 import arrival_process from "~/pages/admin/arrival_process";
+import sales_manager from "~/pages/admin/sales_manager";
 import users_manager from "~/pages/admin/users_manager";
 
 import { mapState, mapActions } from "vuex";
@@ -71,6 +72,7 @@ export default {
           title: "売上",
           description: "日別売上、商品別売上など",
           icon: ["fas", "chart-line"],
+          page: sales_manager,
           authority: ["admin", "inventoryer", "arriver"]
         },
         {
