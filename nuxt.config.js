@@ -49,11 +49,15 @@ module.exports = {
     '@nuxtjs/axios',
     '@nuxtjs/dotenv',
     'nuxt-onsenui-module',
-    ['nuxt-sass-resources-loader', [
-      '@/assets/sass/foundation/mixin.scss'
-    ]],
+    '@nuxtjs/style-resources',
     'nuxt-fontawesome'
   ],
+
+  styleResources: {
+    scss: [
+      '@/assets/sass/foundation/mixin/_index.scss'
+    ]
+  },
 
   router: {
     mode: 'hash'

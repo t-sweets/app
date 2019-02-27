@@ -9,5 +9,6 @@ services:
         volumes:
             - ".:/app"
             - "/app/node_modules"
+            - "/app/.nuxt"
         stdin_open: true
         tty: true
