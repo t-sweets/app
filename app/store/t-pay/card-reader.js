@@ -84,5 +84,26 @@ export const actions = {
         if (response.status == 201) {
             return true
         } else return false
+    },
+
+    async checkout({commit, state}, {ammount, payment_method}) {
+        const response = await this.$axios({
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                // ...this.$store.state.auth
+            },
+            url: process.env.IDM_READER_HOST + "checkout/",
+            data: {
+                merchant_id: process.env.MERCHANT_ID,
+                payment_method: payment_method,
+                ammount: ammount,
+                idm: state.idm,
+            },
+            timeout : 5000,
+        }).catch(err => {
+            return false
+        })
     }
 }
