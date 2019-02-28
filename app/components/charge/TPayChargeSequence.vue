@@ -10,12 +10,12 @@
     <div class="warning">
       <p>{{ announceText }}</p>
       <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
-      <el-button @click="$emit('testNext')" type="text">テスト</el-button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex";
 export default {
   data() {
     return {
@@ -29,17 +29,88 @@ export default {
       if (this.method == "felica") this.method = "qr";
       else this.method = "felica";
     },
-    recognization() {
+
+    /*
+     ** Start Card Reader
+     */
+    async prepareCharge() {
+      this.reader_timeout = 30000;
+      await this.startCardReader(); // フラグを立てる
+      await this.showMessage(["T-Pay Charge", ""]);
+
+      while (this.isReading && this.reader_timeout > -1) {
+        const response = await this.execCardReader();
+        this.reader_timeout--;
+        if (response == true) {
+          // IDを取得後、決済開始
+          this.connectApi();
+          break;
+        } else if (response == null) {
+          this.$ons.notification.alert("CardReader Error!");
+        }
+      }
+    },
+
+    /**
+     * API Tokenなどの発行
+     */
+    async connectApi() {
       this.isPause = true;
       this.loading = this.$loading({
         text: "Loading",
         lock: false
       });
-      setTimeout(() => {
+      if (await this.getApiToken()) {
         this.loading.close();
-        this.$emit("pushSuccess");
-      }, 3000);
-    }
+        this.$emit("amountsInput");
+      }
+    },
+
+    async deposit() {
+      let response;
+      this.loading = this.$loading({
+        text: "Loading",
+        lock: false
+      });
+      if (this.idm) {
+        response = await this.depositWithFelica({
+          amount: this.amount,
+          idm: this.idm
+        });
+      }
+      if (response == true) {
+        this.loading.close();
+        return true;
+      } else {
+        let message = "T-Payサーバーとの通信の際に不明なエラーが発生しました";
+        switch (response) {
+          case "Insufficient funds":
+            message = "残高不足です。チャージしてください";
+            break;
+          case "User auth failed":
+            message = "このカードは登録されていません";
+            break;
+          case "Merchant not in auth user":
+            message =
+              "お使いのアカウントはこの店舗で決済を行うことができません";
+            break;
+        }
+        this.loading.close();
+        this.$ons.notification.alert(message);
+        return false;
+      }
+    },
+    ...mapActions("t-pay", [
+      "getApiToken",
+      "getMerchantID",
+      "depositWithFelica"
+    ]),
+    ...mapActions("t-pay/card-reader", [
+      "startCardReader",
+      "stopCardReader",
+      "execCardReader",
+      "showMessage"
+    ])
   },
   computed: {
     changeMethodText() {
@@ -49,8 +120,10 @@ export default {
     announceText() {
       if (this.method == "felica") return "リーダーに Felicaをかざして下さい";
       else return "スマートフォンでQRを読み取って下さい";
-    }
-  }
+    },
+    ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
+  },
+  props: ["amount"]
 };
 </script>
 
