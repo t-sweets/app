@@ -165,13 +165,12 @@ export default {
       });
       return total;
     },
-
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"]),
     ...mapState("t-pay", ["uuid"]),
     ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
   },
-  created() {
+  mounted() {
     this.preparePayment();
   }
 };
