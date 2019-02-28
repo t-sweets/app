@@ -68,27 +68,57 @@ export default {
         this.reader_timeout--;
         if (response == true) {
           // IDを取得後、決済開始
-          this.recognization();
+          this.connectApi();
           break;
         } else if (response == null) {
           this.$ons.notification.alert("CardReader Error!");
         }
       }
     },
-    /*
-     ** 決済テスト用
+
+    /**
+     * API Tokenなどの発行
      */
-    async recognization() {
+    async connectApi() {
       this.isPause = true;
       this.loading = this.$loading({
         text: "Loading",
         lock: false
       });
+      if (await this.getApiToken()) {
+        const response = await this.checkoutWithFelica({
+          amount: this.totalPrice,
+          idm: this.idm
+        });
+        if (response == true) {
+          this.recognization();
+        } else {
+          let message = "T-Payサーバーとの通信の際に不明なエラーが発生しました";
+          console.log(response);
 
+          switch (response) {
+            case "Insufficient funds":
+              message = "残高不足です。チャージしてください";
+              break;
+            case "User auth failed":
+              message = "このカードは登録されていません";
+              break;
+            case "Merchant not in auth user":
+              message =
+                "お使いのアカウントはこの店舗で決済を行うことができません";
+              break;
+          }
+          this.loading.close();
+          this.$ons.notification.alert(message);
+        }
+      }
+    },
+
+    async recognization() {
       if (
         await this.purchaseCreate({
           id: this.method.id,
-          uuid: "aaaaaaa" // 決済番号
+          uuid: this.uuid // 決済番号
         })
       ) {
         this.loading.close();
@@ -99,6 +129,11 @@ export default {
       }
     },
     ...mapActions("pos/purchase", ["purchaseCreate"]),
+    ...mapActions("t-pay", [
+      "getApiToken",
+      "getMerchantID",
+      "checkoutWithFelica"
+    ]),
     ...mapActions("t-pay/card-reader", [
       "startCardReader",
       "stopCardReader",
@@ -130,12 +165,12 @@ export default {
       });
       return total;
     },
-
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"]),
+    ...mapState("t-pay", ["uuid"]),
     ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
   },
-  created() {
+  mounted() {
     this.preparePayment();
   }
 };

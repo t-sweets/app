@@ -15,10 +15,14 @@ export const mutations = {
     setIDM(state, idm) {
         state.idm = idm
     },
+    resetIDM(state) {
+        state.idm = null;
+    },
 
     setReading(state, bool) {
         state.isReading = bool
     }
+    
 }
 
 export const actions = {
@@ -84,5 +88,5 @@ export const actions = {
         if (response.status == 201) {
             return true
         } else return false
-    }
+    },
 }
