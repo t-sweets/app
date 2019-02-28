@@ -352,30 +352,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.product-image-uploader {
-  .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    &:hover {
-      border-color: #409eff;
+.main {
+  height: 450px;
+  overflow-y: scroll;
+  .product-image-uploader {
+    .el-upload {
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      &:hover {
+        border-color: #409eff;
+      }
     }
-  }
-  .product-image-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .product-image {
-    position: absolute;
-    width: 178px;
-    height: 178px;
-    display: block;
+    .product-image-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      line-height: 178px;
+      text-align: center;
+    }
+    .product-image {
+      position: absolute;
+      width: 178px;
+      height: 178px;
+      display: block;
+    }
   }
 }
 .product-confirm-image {
@@ -398,3 +402,4 @@ p.form-text {
   text-align: left;
 }
 </style>
+

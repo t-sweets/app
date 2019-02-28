@@ -58,12 +58,14 @@
     </transition>
     <transition name="sequence">
       <t-pay v-if="paymethod=='4k4g96ld83'" @pushSuccess="pushSuccess" @reSelect="reSelect"></t-pay>
+      <cash v-if="paymethod=='1a0l2s9k3d'" @pushSuccess="pushSuccess" @reSelect="reSelect"></cash>
     </transition>
   </v-ons-dialog>
 </template>
 
 <script>
 import TPay from "~/components/payment/TPaySequence";
+import Cash from "~/components/payment/CashSequence";
 import { mapState } from "vuex";
 export default {
   data() {
@@ -99,7 +101,8 @@ export default {
     }
   },
   components: {
-    TPay
+    TPay,
+    Cash
   },
   computed: {
     ...mapState("pos/payment-method", ["payment_method"])
