@@ -16,14 +16,15 @@
     </el-row>
     <transition name="buttons">
       <t-pay
-        v-if="!addReady && uuid  == '4k4g96ld83'"
-        @pushSuccess="pushSuccess"
-        @testNext="testNext"
+        v-show="!addReady && !depositInput && uuid  == '4k4g96ld83'"
+        ref="tpay_sequense"
+        :amount="price"
+        @amountsInput="amountsTransition"
       ></t-pay>
     </transition>
     <transition name="sequence">
-      <div v-show="addReady">
-        <div class="charge-price">
+      <div v-show="addReady || depositInput">
+        <div class="charge-price" v-if="addReady">
           <el-input-number v-model="price" size="large" :min="500" :step="500" :max="10000"></el-input-number>
         </div>
         <div class="total">
@@ -36,9 +37,15 @@
             <el-col class="right" :span="4">¥{{ price }}</el-col>
           </el-row>
         </div>
-
-        <div class="payment-btns">
-          <el-button type="primary" round icon="el-icon-message">チャージをする</el-button>
+        <div v-if="depositInput">
+          <deposit-input
+            @back-amount="amountsTransition"
+            @exec-charge="execCharge"
+            :amount="price"
+          />
+        </div>
+        <div class="payment-btns" v-if="addReady">
+          <el-button type="primary" round icon="el-icon-message" @click="depositTransition">チャージをする</el-button>
         </div>
       </div>
     </transition>
@@ -48,11 +55,14 @@
 <script>
 import TPay from "~/components/charge/TPayChargeSequence";
 
+import DepositInput from "~/components/charge/DepositSequence";
+
 export default {
   data() {
     return {
       price: 500,
-      addReady: false
+      addReady: false,
+      depositInput: false
     };
   },
   props: ["isShowTotal", "selectedMethod"],
@@ -63,21 +73,47 @@ export default {
     },
     resetData() {
       this.addReady = false;
+      this.depositInput = false;
       this.price = 500;
     },
-    tpay() {
-      this.change(false);
-      this.$emit("pushTPay");
-    },
-    testNext() {
+    /**
+     * チャージ金額入力画面に推移
+     */
+    amountsTransition() {
       this.addReady = true;
+      this.depositInput = false;
     },
-    pushSuccess() {
-      this.$emit("pushSuccess");
+    depositTransition() {
+      this.addReady = false;
+      this.depositInput = true;
+    },
+    /**
+     * チャージを実行。selectedMethodの子要素のメソッドを実行
+     */
+    execCharge() {
+      if (!this.selectedMethod) return false;
+      this.$ons.notification.confirm({
+        title: "確認",
+        message: this.confirmText,
+        buttonLabel: ["キャンセル", "チャージ"],
+        callback: async index => {
+          if (index == 0) return false;
+          let response;
+          switch (this.selectedMethod.uuid) {
+            case "4k4g96ld83":
+              response = await this.$refs.tpay_sequense.deposit();
+              break;
+          }
+          if (response == true) {
+            this.$emit("pushSuccess");
+          }
+        }
+      });
     }
   },
   components: {
-    TPay
+    TPay,
+    DepositInput
   },
   computed: {
     methodName() {
@@ -86,6 +122,8 @@ export default {
     title() {
       if (this.addReady || !this.selectedMethod) {
         return "チャージ金額を入力";
+      } else if (this.depositInput) {
+        return "入金額を入力";
       } else {
         switch (this.selectedMethod.uuid) {
           case "4k4g96ld83":
@@ -95,6 +133,16 @@ export default {
     },
     uuid() {
       return this.selectedMethod ? this.selectedMethod.uuid : "";
+    },
+    confirmText() {
+      return "¥" + this.price + "をチャージしますか？";
+    }
+  },
+  async mounted() {
+    switch (this.uuid) {
+      case "4k4g96ld83":
+        await this.$refs.tpay_sequense.prepareCharge();
+        break;
     }
   }
 };

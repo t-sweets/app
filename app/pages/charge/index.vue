@@ -15,18 +15,19 @@
       </el-col>
     </el-row>
 
-    <transition name="el-zoom-in-bottom">
-      <charge-dialog
-        :isShowTotal="isShowTotal"
-        :selectedMethod="selectedMethod"
-        @showTotal="showTotal"
-      />
-    </transition>
+    <charge-dialog
+      v-if="isShowTotal"
+      :isShowTotal="isShowTotal"
+      :selectedMethod="selectedMethod"
+      @showTotal="showTotal"
+      @pushSuccess="pushSuccess"
+    />
   </v-ons-page>
 </template>
 
 <script>
 import pos from "~/pages/payment/";
+import DonePage from "~/pages/charge/done";
 import ChargeDialog from "~/components/charge/ChargeDialog";
 import PaymentButton from "~/components/charge/PaymentButton";
 
@@ -53,6 +54,10 @@ export default {
     selectMethod(method) {
       this.selectedMethod = method;
       this.showTotal(true);
+    },
+    pushSuccess() {
+      this.showTotal(false);
+      this.$emit("push-page", DonePage);
     },
     ...mapActions("pos/payment-method", ["getPaymentMethod"])
   },
