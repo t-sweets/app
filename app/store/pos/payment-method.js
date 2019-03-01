@@ -41,13 +41,13 @@ export const actions = {
             payMethod.some((method) => {
                 let plusData = {};
                     switch(method.uuid) {
-                        case "1a0l2s9k3d":
+                        case "F5EF99BC-0FF0-4CA4-805D-5045E12B90CF":
                             plusData = {
                                 charge_title: "",
                                 icon: ["fas", "cash-register"],
                             }
                             break;
-                        case "4k4g96ld83":  // t-pay
+                        case "2ADEA824-0027-41B5-B243-10F2D24FDD4B":  // t-pay
                             plusData = {
                                 charge_title: "T-Pay チャージ",
                                 icon: ["fas", "cash-register"],

@@ -57,8 +57,16 @@
       </div>
     </transition>
     <transition name="sequence">
-      <t-pay v-if="paymethod=='4k4g96ld83'" @pushSuccess="pushSuccess" @reSelect="reSelect"></t-pay>
-      <cash v-if="paymethod=='1a0l2s9k3d'" @pushSuccess="pushSuccess" @reSelect="reSelect"></cash>
+      <t-pay
+        v-if="paymethod=='2ADEA824-0027-41B5-B243-10F2D24FDD4B'"
+        @pushSuccess="pushSuccess"
+        @reSelect="reSelect"
+      ></t-pay>
+      <cash
+        v-if="paymethod=='F5EF99BC-0FF0-4CA4-805D-5045E12B90CF'"
+        @pushSuccess="pushSuccess"
+        @reSelect="reSelect"
+      ></cash>
     </transition>
   </v-ons-dialog>
 </template>

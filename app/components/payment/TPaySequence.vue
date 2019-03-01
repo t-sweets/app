@@ -154,7 +154,8 @@ export default {
 
     method() {
       return this.payment_method.filter((_method, index) => {
-        if (_method.uuid == "4k4g96ld83") return _method;
+        if (_method.uuid == "2ADEA824-0027-41B5-B243-10F2D24FDD4B")
+          return _method;
       })[0];
     },
 

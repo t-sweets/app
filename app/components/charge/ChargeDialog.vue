@@ -16,9 +16,10 @@
     </el-row>
     <transition name="buttons">
       <t-pay
-        v-show="!addReady && !depositInput && uuid  == '4k4g96ld83'"
+        v-show="!addReady && !depositInput && uuid  == '2ADEA824-0027-41B5-B243-10F2D24FDD4B'"
         ref="tpay_sequense"
         :amount="price"
+        :selectedMethod="selectedMethod"
         @amountsInput="amountsTransition"
       ></t-pay>
     </transition>
@@ -100,7 +101,7 @@ export default {
           if (index == 0) return false;
           let response;
           switch (this.selectedMethod.uuid) {
-            case "4k4g96ld83":
+            case "2ADEA824-0027-41B5-B243-10F2D24FDD4B":
               response = await this.$refs.tpay_sequense.deposit();
               break;
           }
@@ -126,7 +127,7 @@ export default {
         return "入金額を入力";
       } else {
         switch (this.selectedMethod.uuid) {
-          case "4k4g96ld83":
+          case "2ADEA824-0027-41B5-B243-10F2D24FDD4B":
             return "ユーザー認証";
         }
       }
@@ -140,7 +141,7 @@ export default {
   },
   async mounted() {
     switch (this.uuid) {
-      case "4k4g96ld83":
+      case "2ADEA824-0027-41B5-B243-10F2D24FDD4B":
         await this.$refs.tpay_sequense.prepareCharge();
         break;
     }

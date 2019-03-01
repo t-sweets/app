@@ -70,7 +70,8 @@ export default {
   computed: {
     method() {
       return this.payment_method.filter((_method, index) => {
-        if (_method.uuid == "1a0l2s9k3d") return _method;
+        if (_method.uuid == "F5EF99BC-0FF0-4CA4-805D-5045E12B90CF")
+          return _method;
       })[0];
     },
 

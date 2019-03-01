@@ -157,5 +157,28 @@ export const actions = {
         } else return false;
     },
 
+    async chargeCreate({state, rootState}, {payment_method_id, amount}) {
+        const response = await this.$axios({
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                ...rootState.pos.auth
+            },
+            url: process.env.POS_HOST + "api/v1/charges",
+            data: {
+                payment_method_id: payment_method_id, 
+                amount: amount,
+            },
+            timeout : 5000,
+        }).catch(err => {
+            return false
+        })
+
+        if (response.status == 201, response.data.success) {
+            return true;
+        } else return false;
+    },
+
 
 }

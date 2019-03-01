@@ -63,6 +63,9 @@ export default {
       if (await this.getApiToken()) {
         this.loading.close();
         this.$emit("amountsInput");
+      } else {
+        this.loading.close();
+        this.$ons.notification.alert("t-payサーバーとの通信に失敗しました");
       }
     },
 
@@ -79,6 +82,12 @@ export default {
         });
       }
       if (response == true) {
+        // POSに反映
+        this.chargeCreate({
+          payment_method_id: this.selectedMethod.id,
+          amount: this.amount
+        });
+
         this.loading.close();
         return true;
       } else {
@@ -100,6 +109,7 @@ export default {
         return false;
       }
     },
+    ...mapActions("pos/purchase", ["chargeCreate"]),
     ...mapActions("t-pay", [
       "getApiToken",
       "getMerchantID",
@@ -123,7 +133,7 @@ export default {
     },
     ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
   },
-  props: ["amount"]
+  props: ["amount", "selectedMethod"]
 };
 </script>
 

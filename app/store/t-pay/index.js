@@ -16,7 +16,7 @@ export const mutations = {
 
 export const actions = {
 
-    async getApiToken({commit, state}) {
+    async getApiToken({commit}) {
         const response = await this.$axios({
             method: "POST",
             headers: {
