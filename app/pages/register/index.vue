@@ -11,6 +11,7 @@
       :isShowTotal="isShowTotal"
       @openModal="openModal"
       @backMenu="backMenu"
+      @registerDone="registerDone"
     />
   </v-ons-page>
 </template>
@@ -31,6 +32,10 @@ export default {
     backMenu() {
       this.openModal(false);
       this.$emit("pop-page");
+    },
+    registerDone() {
+      this.openModal(false);
+      this.$emit("resetPosMain");
     }
   },
   components: { registerModal },

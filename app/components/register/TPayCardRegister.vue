@@ -40,7 +40,7 @@
             <p>{{ announceText }}</p>
             <p class="subtext">T-Payサイトでログインする事で、アカウントと紐付ける事ができます。</p>
 
-            <el-button type="primary">完了</el-button>
+            <el-button type="primary" @click="$emit('registerDone')">完了</el-button>
             <br>
             <el-button type="text" @click="reSelect">別のカードを登録する</el-button>
           </div>
