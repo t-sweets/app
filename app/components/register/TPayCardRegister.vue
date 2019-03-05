@@ -87,7 +87,9 @@ export default {
       if (this.idm) {
         this.isPause = true; // stop animation
         this.reading = false;
-        this.qrURL = `${process.env.TPAY_WEBHOST}?method=register&${this.idm}`;
+        this.qrURL = `${process.env.TPAY_WEBHOST}?method=register&idm=${
+          this.idm
+        }`;
       } else return false;
     },
     change(bool) {
