@@ -34,16 +34,28 @@ export default {
       margin-left: 15px;
     }
   }
-
   .description {
     margin-top: 80px;
     color: #999;
   }
-
   &.big {
     min-height: 40vh;
     .title {
       padding-top: 100px;
+    }
+  }
+  &.small {
+    min-height: 20vh;
+    .title {
+      padding-top: 50px;
+      font-size: 28px;
+      span {
+        margin-left: 15px;
+      }
+    }
+    .description {
+      margin-top: 50px;
+      padding-bottom: 25px;
     }
   }
 

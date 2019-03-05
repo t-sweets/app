@@ -64,7 +64,7 @@ export default {
       const func = initializeMethods[i];
       if (await func()) {
         this.progress += 100 / initializeMethods.length;
-        await new Promise(resolve => setTimeout(resolve, 500)); // sleep
+        await new Promise(resolve => setTimeout(resolve, 0)); // sleep
         if (this.progress >= 99) this.start();
         else continue;
       } else {
