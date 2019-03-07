@@ -48,7 +48,7 @@ const newWin = () => {
     win.maximize()
 
     // Developer Tools
-    win.openDevTools();
+    // win.openDevTools();
 
     const ret = globalShortcut.register('Control+Q', () => {
         win.close()
