@@ -26,17 +26,19 @@ export const mutations = {
 }
 
 export const actions = {
-    async startCardReader({commit, state}) {
+    async startCardReader({commit, dispatch}) {
+        dispatch("emissionLED", "waiting")
         await commit("setReading", true);
     },
-    async stopCardReader({commit, state}) {
+    async stopCardReader({commit, dispatch}) {
+        dispatch("emissionLED")
         await commit("setReading", false);
     },
     /**
      * カードリーダを起動
      */
-    async execCardReader({commit, state}) {
-        
+    async execCardReader({commit, state, dispatch}) {
+        dispatch("emissionLED", "waiting")
         const response = await this.$axios({
             method: "GET",
             headers: {
@@ -45,21 +47,31 @@ export const actions = {
                 // ...this.$store.state.auth
             },
             url: process.env.IDM_READER_HOST + "api/v1/card",
-            timeout : 3000,
+            timeout : 5000,
         }).catch(err => {
             commit("setReading", false)
-            return null
+            return err.response
         })
-
+        
+        if (!response) {
+            await dispatch("emissionLED", "error")
+            await commit("setReading", false)
+            return false
+        }
         if (response.status == 200) {
             await commit("setIDM", response.data.idm)
             await commit("setReading", false)
+            dispatch("emissionLED", "success")
+            setTimeout(() => {
+                dispatch("emissionLED")
+            }, 50000);
             return true
-        } else if (!state.isReading && response.status == 204 ) {
-            return false
+        } else if (response.status == 204) {
+            return "continue"
         } else {
             await commit("setReading", false)
-            return null
+            await dispatch("emissionLED", "error")
+            return false
         }
     },
 
@@ -80,7 +92,7 @@ export const actions = {
             },
             url: process.env.IDM_READER_HOST + "api/v1/message",
             data: state.displayText,
-            timeout : 3000,
+            timeout : 5000,
         }).catch(err => {
             return false
         })
@@ -88,5 +100,28 @@ export const actions = {
         if (response.status == 201) {
             return true
         } else return false
+    },
+
+    /**
+     * カードリーダのモニタへメッセージを表示
+     */
+    async emissionLED({commit, state}, mode) {
+
+        if (!mode) mode = "destroy";
+
+        const response = await this.$axios({
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+            },
+            url: process.env.IDM_READER_HOST + "api/v1/led",
+            data: {
+                mode: mode
+            },
+            timeout : 5000,
+        }).catch(err => {
+            return false
+        })
     },
 }

@@ -34,23 +34,44 @@ export default {
      ** Start Card Reader
      */
     async prepareCharge() {
-      this.reader_timeout = 30000;
+      this.reader_timeout = 10;
       await this.startCardReader(); // フラグを立てる
-      await this.showMessage(["T-Pay Charge", ""]);
+      await this.showMessage(["Touch Felica", "Card"]);
 
       while (this.isReading && this.reader_timeout > -1) {
         const response = await this.execCardReader();
+
         this.reader_timeout--;
-        if (response == true) {
-          // IDを取得後、決済開始
+        if (response === true) {
+          // IDを取得後、登録QR発行
           this.connectApi();
           break;
-        } else if (response == null) {
-          this.$ons.notification.alert("CardReader Error!");
+        } else if (this.reader_timeout <= -1) {
+          // exit timeout
+          this.emissionLED("error");
+          this.isPause = true;
+          await this.showMessage(["Timeout Reader", ""]);
+          await this.stopCardReader();
+
+          this.$ons.notification.confirm({
+            title: "エラー",
+            message: "リーダーがタイムアウトしました",
+            cancelable: true,
+            buttonLabel: ["キャンセル", "再試行"],
+            callback: async index => {
+              if (index == 1) {
+                this.isPause = false;
+                this.prepareCharge();
+              } else {
+                await this.showMessage(["", ""]);
+              }
+            }
+          });
+        } else if (response == false) {
+          this.$ons.notification.alert("不明なエラーが発生しました。");
         }
       }
     },
-
     /**
      * API Tokenなどの発行
      */
@@ -119,7 +140,8 @@ export default {
       "startCardReader",
       "stopCardReader",
       "execCardReader",
-      "showMessage"
+      "showMessage",
+      "emissionLED"
     ])
   },
   computed: {

@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     popPage(event) {
-      this.pageStack.unshift(event);
+      if (event) this.pageStack.unshift(event);
       this.pageStack.splice(1, this.pageStack.length - 1);
     },
     resetPosMain() {

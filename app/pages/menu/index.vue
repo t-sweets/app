@@ -10,7 +10,7 @@
     </v-ons-toolbar>
 
     <el-row>
-      <el-col :span="12" v-for="menu in menus" :key="menu.id" :offset="0">
+      <el-col :span="sizeOffset(menu.size)" v-for="menu in menus" :key="menu.id" :offset="0">
         <div @click="menu.openPage">
           <menu-button ref="prod" :menu="menu"/>
         </div>
@@ -57,6 +57,7 @@
 
 <script>
 import pos from "~/pages/payment/";
+import register from "~/pages/register/";
 import charge from "~/pages/charge/index";
 import adminPage from "~/pages/admin/";
 import MenuButton from "~/components/menu/MenuButton";
@@ -86,6 +87,15 @@ export default {
           description: "電子マネーの残高チャージはこちら",
           openPage: () => {
             this.$emit("push-page", charge);
+          }
+        },
+        {
+          title: "カード登録",
+          size: "small",
+          icon: ["fas", "credit-card"],
+          description: "T-Payのカードを登録する",
+          openPage: () => {
+            this.$emit("push-page", register);
           }
         }
       ],
@@ -129,9 +139,20 @@ export default {
         });
       }
     },
+    sizeOffset(size) {
+      switch (size) {
+        case "big":
+          return 12;
+        case "small":
+          return 6;
+        default:
+          return 8;
+      }
+    },
     ...mapActions("pos", ["getProducts"]),
     ...mapActions("pos/admin", ["loginAdmin"])
-  }
+  },
+  computed: {}
 };
 </script>
 
