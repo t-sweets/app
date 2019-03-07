@@ -33,9 +33,25 @@ if (config.dev) {
 let win = null // Current window
 const electron = require('electron')
 const app = electron.app
+const globalShortcut = electron.globalShortcut
 const newWin = () => {
-    win = new electron.BrowserWindow({})
+    const window_config = {
+        kiosk: true,
+        fullscreen: true,
+        frame: false
+    }
+    win = new electron.BrowserWindow(window_config)
+
     win.maximize()
+
+    // Developer Tools
+    // win.openDevTools();
+
+    const ret = globalShortcut.register('Control+Q', () => {
+        win.close()
+        app.quit()
+    })
+
     win.on('closed', () => win = null)
     if (config.dev) {
         // Wait for nuxt to build
