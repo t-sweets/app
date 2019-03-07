@@ -8,12 +8,23 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=local_dev nuxt",
     "dev-electron": "cross-env NODE_ENV=development electron .",
-    "build": "nuxt build && electron-builder"
+    "build": "nuxt build",
+    "build-win": "nuxt build && electron-builder --win --ia32",
+    "build-mac": "nuxt build && electron-builder --mac",
+    "compose-win": "electron-builder --win --ia32",
+    "compose-mac": "electron-builder --mac"
   },
   "build": {
-    "appId": "sweets front app",
+    "productName": "sweets front app",
+    "appId": "com.sskmy1024.internal.sweetsposapp",
     "directories": {
       "output": "build"
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns"
+    },
+    "win": {
+      "icon": "build/icons/icon.ico"
     }
   },
   "dependencies": {
