@@ -1,10 +1,5 @@
 <template>
-  <v-ons-dialog
-    class="register-dialog"
-    cancelable
-    :visible="isShowTotal"
-    @posthide="$emit('backMenu')"
-  >
+  <v-ons-dialog class="register-dialog" cancelable :visible="isShowTotal" @posthide="postHide">
     <el-row class="nav">
       <el-col :span="4">
         <v-ons-button
@@ -56,7 +51,7 @@ export default {
   data() {
     return {
       isPause: false,
-      qrURL: null,
+      qrURL: "",
       reading: true,
 
       reader_timeout: 0
@@ -66,25 +61,46 @@ export default {
     /*
      ** Start Card Reader
      */
-    async prepareCharge() {
-      this.reader_timeout = 30000;
+    async prepareRegister() {
+      this.reader_timeout = 10;
       await this.startCardReader(); // フラグを立てる
-      await this.showMessage(["Touch Felica Card", ""]);
+      await this.showMessage(["Touch Felica", "Card"]);
 
       while (this.isReading && this.reader_timeout > -1) {
         const response = await this.execCardReader();
+
         this.reader_timeout--;
-        if (response == true) {
+        if (response === true) {
           // IDを取得後、登録QR発行
           this.registerQR();
           break;
-        } else if (response == null) {
-          this.$ons.notification.alert("CardReader Error!");
+        } else if (response == false) {
+          this.$ons.notification.alert("不明なエラーが発生しました。");
+        } else if (this.reader_timeout <= -1) {
+          // exit timeout
+          this.emissionLED("error");
+          this.isPause = true;
+          await this.showMessage(["Timeout Reader", ""]);
+          await this.stopCardReader();
+
+          this.$ons.notification.confirm({
+            title: "エラー",
+            message: "リーダーがタイムアウトしました",
+            cancelable: true,
+            buttonLabel: ["キャンセル", "再試行"],
+            callback: async index => {
+              if (index == 1) {
+                this.isPause = false;
+                this.prepareRegister();
+              }
+            }
+          });
         }
       }
     },
     registerQR() {
       if (this.idm) {
+        this.showMessage(["Complete!", ""]);
         this.isPause = true; // stop animation
         this.reading = false;
         this.qrURL = `${process.env.TPAY_WEBHOST}?method=register&idm=${
@@ -102,14 +118,19 @@ export default {
     reSelect() {
       this.resetData();
       this.reading = true;
-      this.qrURL = null;
-      this.prepareCharge();
+      this.qrURL = "";
+      this.prepareRegister();
+    },
+    async postHide() {
+      await this.stopCardReader();
+      this.$emit("backMenu");
     },
     ...mapActions("t-pay/card-reader", [
       "startCardReader",
       "stopCardReader",
       "execCardReader",
-      "showMessage"
+      "showMessage",
+      "emissionLED"
     ])
   },
   computed: {
@@ -128,7 +149,7 @@ export default {
   },
   props: ["isShowTotal"],
   async mounted() {
-    this.prepareCharge();
+    this.prepareRegister();
   }
 };
 </script>
