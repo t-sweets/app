@@ -24,7 +24,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: "http://localhost:3000/api/v1/payment_methods",
+            url: process.env.POS_HOST + "/payment_methods",
             timeout: 1000,
         })
         .catch(err => {

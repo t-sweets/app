@@ -29,7 +29,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.admin.auth
             },
-            url: process.env.POS_HOST+"api/v1/users",
+            url: process.env.POS_HOST+"/users",
             timeout: 3000
         })
         .catch(err => {
@@ -52,7 +52,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.admin.auth
             },
-            url: process.env.POS_HOST+"api/v1/auth",
+            url: process.env.POS_HOST+"/auth",
             data: {
                 ...data
             },
@@ -83,7 +83,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.admin.auth
             },
-            url: process.env.POS_HOST+"api/v1/auth",
+            url: process.env.POS_HOST+"/auth",
             data: {
                 id: id,
                 ...data
