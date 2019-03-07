@@ -42,7 +42,7 @@ export const actions = {
                 email: email,
                 password: password
             },
-            url: process.env.POS_HOST + "auth/sign_in"
+            url: process.env.POS_HOST + "/auth/sign_in"
         })
         .catch(err => {
             return false

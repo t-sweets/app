@@ -53,7 +53,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: process.env.POS_HOST + "purchases/check",
+            url: process.env.POS_HOST + "/purchases/check",
             data: {
                 products: products
             },
@@ -85,7 +85,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: process.env.POS_HOST + "purchases",
+            url: process.env.POS_HOST + "/purchases",
             data: {
                 products: products,
                 payment_method_id: data.id,
@@ -165,7 +165,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.auth
             },
-            url: process.env.POS_HOST + "charges",
+            url: process.env.POS_HOST + "/charges",
             data: {
                 payment_method_id: payment_method_id, 
                 amount: amount,

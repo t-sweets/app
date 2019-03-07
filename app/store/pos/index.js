@@ -122,7 +122,7 @@ export const actions = {
                 email: process.env.POS_AUTH_EMAIL,
                 password: process.env.POS_AUTH_PASSWORD
             },
-            url: process.env.POS_HOST + "auth/sign_in"
+            url: process.env.POS_HOST + "/auth/sign_in"
         })
         .catch(err => {
             return false
@@ -152,7 +152,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...state.auth
             },
-            url: process.env.POS_HOST +"authorities",
+            url: process.env.POS_HOST +"/authorities",
             timeout: 1000
         })
         .catch(err => {
@@ -174,7 +174,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...state.auth
             },
-            url: process.env.POS_HOST +"products",
+            url: process.env.POS_HOST +"/products",
             timeout: 3000
         })
         .catch(err => {
