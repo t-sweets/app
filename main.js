@@ -37,6 +37,7 @@ const electron = require('electron')
 const app = electron.app
 const globalShortcut = electron.globalShortcut
 const {appUpdater} = require('./src/autoupdater');
+const os = require('os')
 const newWin = () => {
     const window_config = {
         kiosk: true,
@@ -56,7 +57,7 @@ const newWin = () => {
     })
 
     // Update check
-    // appUpdater()
+    if (os.platform() == 'win32') appUpdater()
 
     win.on('closed', () => win = null)
     if (config.dev) {
