@@ -33,6 +33,7 @@
       "icon": "src/icons/icon.icns"
     },
     "win": {
+      "target": "squirrel",
       "icon": "src/icons/icon.ico"
     }
   },
@@ -50,11 +51,13 @@
     "sass-loader": "^7.1.0",
     "sweet-modal-vue": "^2.0.0",
     "uuid": "^3.3.2",
-    "vue-qriously": "^1.1.1"
+    "vue-qriously": "^1.1.1",
+    "app-builder-lib": "^20.39.0"
   },
   "devDependencies": {
     "electron": "^3.0.10",
     "electron-builder": "^20.38.5",
+    "electron-builder-squirrel-windows": "^20.39.0",
     "nodemon": "^1.11.0"
   }
 }
