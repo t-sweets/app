@@ -83,11 +83,8 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*",
                 ...rootState.pos.admin.auth
             },
-            url: process.env.POS_HOST+"/auth",
-            data: {
-                id: id,
-                ...data
-            },
+            url: process.env.POS_HOST+"/users/"+id,
+            data: data,
             timeout: 3000
         })
         .catch(err => {

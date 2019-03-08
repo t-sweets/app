@@ -105,7 +105,7 @@ export default {
         /^(https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/
       )
         ? path
-        : process.env.POS_HOST + "product_images/" + path;
+        : process.env.POS_HOST + "/../../product_images/" + path;
     }
   },
   components: {

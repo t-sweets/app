@@ -22,7 +22,7 @@
         <el-header>管理者ログイン</el-header>
         <el-main>
           <v-ons-input
-            v-model="login.email"
+            v-model="login.userkey"
             modifier="underbar"
             type="email"
             placeholder="admin@example.com"
@@ -101,7 +101,7 @@ export default {
       ],
 
       login: {
-        email: null,
+        userkey: null,
         password: null
       }
     };
@@ -112,17 +112,17 @@ export default {
   methods: {
     openLoginPrompt() {
       this.login = {
-        email: null,
+        userkey: null,
         password: null
       };
       this.$refs.modal.open();
     },
     async pushLogin() {
-      if (this.login.email && this.login.password) {
+      if (this.login.userkey && this.login.password) {
         this.$refs.modal.close();
         if (
           await this.loginAdmin({
-            email: this.login.email,
+            userkey: this.login.userkey,
             password: this.login.password
           })
         ) {
@@ -134,8 +134,9 @@ export default {
         this.$ons.notification.alert({
           title: "エラー",
           message:
-            (this.login.email ? "パスワード" : "メールアドレス") +
-            "が入力されていません"
+            (this.login.userkey
+              ? "パスワード"
+              : "ユーザ名もしくはメールアドレス") + "が入力されていません"
         });
       }
     },

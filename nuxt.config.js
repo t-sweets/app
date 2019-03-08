@@ -50,7 +50,8 @@ module.exports = {
     ['@nuxtjs/dotenv',{ filename: '.env.production' }],
     'nuxt-onsenui-module',
     '@nuxtjs/style-resources',
-    'nuxt-fontawesome'
+    'nuxt-fontawesome',
+    'nuxt-vuex-localstorage'
   ],
 
   styleResources: {

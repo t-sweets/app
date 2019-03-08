@@ -7,7 +7,7 @@
       :align="styles"
     >
       <img :src="toImageUrl" class="image">
-      <div style="padding: 14px;">
+      <div style="padding: 10px;">
         <span class="title">{{ product.name }}</span>
         <div class="bottom clearfix">
           <time class="price">&yen; {{ product.price }}</time>
@@ -54,7 +54,9 @@ export default {
         /^(https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/
       )
         ? this.product.image_path
-        : process.env.POS_HOST + "product_images/" + this.product.image_path;
+        : process.env.POS_HOST +
+            "/../../product_images/" +
+            this.product.image_path;
     }
   }
 };
@@ -86,7 +88,7 @@ export default {
 }
 .product-card {
   @include pc {
-    height: 350px;
+    height: 275px;
   }
   @include tab {
     height: 300px;
@@ -96,7 +98,7 @@ export default {
   }
   .title {
     @include pc {
-      font-size: 25px;
+      font-size: 18px;
     }
     @include tab {
       font-size: 23px;
@@ -106,14 +108,15 @@ export default {
     }
   }
   .price {
-    font-size: 20px;
+    font-size: 15px;
     color: #999;
   }
   .image {
-    width: 100%;
+    object-fit: cover;
+    margin: 0 auto;
     display: block;
     @include pc {
-      max-height: 250px;
+      max-height: 200px;
     }
     @include tab {
       max-height: 200px;
@@ -123,7 +126,7 @@ export default {
     }
   }
   .bottom {
-    margin-top: 13px;
+    margin-top: 10px;
     line-height: 12px;
   }
   .clearfix:before,

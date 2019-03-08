@@ -31,7 +31,10 @@ export const mutations = {
 }
 
 export const actions = {
-    async loginAdmin({ commit }, {email, password}) {
+    async loginAdmin({ commit }, {userkey, password}) {
+        let data = {}
+        if (userkey.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)) data.email = userkey
+        else data.name = userkey
         const response = await this.$axios({
             method: "POST",
             headers: {
@@ -39,7 +42,7 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*"
             },
             data: {
-                email: email,
+                ...data,
                 password: password
             },
             url: process.env.POS_HOST + "/auth/sign_in"
