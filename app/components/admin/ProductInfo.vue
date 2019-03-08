@@ -310,9 +310,7 @@ export default {
             /^(https?|ftp)(:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)$/
           )
           ? this.product.image_path
-          : process.env.POS_HOST +
-            "/../../product_images/" +
-            this.product.image_path
+          : process.env.POS_HOST + "/../.." + this.product.image_path
         : "";
     },
     toImageData() {
