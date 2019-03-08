@@ -1,3 +1,5 @@
+require('dotenv').config({ path: __dirname + '/../app/.env.production' })
+
 /*
 **  Nuxt
 */
@@ -34,6 +36,7 @@ let win = null // Current window
 const electron = require('electron')
 const app = electron.app
 const globalShortcut = electron.globalShortcut
+const {appUpdater} = require('./src/autoupdater');
 const newWin = () => {
     const window_config = {
         kiosk: true,
@@ -51,6 +54,9 @@ const newWin = () => {
         win.close()
         app.quit()
     })
+
+    // Update check
+    // appUpdater()
 
     win.on('closed', () => win = null)
     if (config.dev) {
