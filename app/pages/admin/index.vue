@@ -41,6 +41,7 @@ import product_manager from "~/pages/admin/product_manager";
 import arrival_process from "~/pages/admin/arrival_process";
 import sales_manager from "~/pages/admin/sales_manager";
 import users_manager from "~/pages/admin/users_manager";
+import confirm_connection from "~/pages/admin/confirm_connection";
 
 import { mapState, mapActions } from "vuex";
 
@@ -74,6 +75,13 @@ export default {
           icon: ["fas", "chart-line"],
           page: sales_manager,
           authority: ["admin", "inventoryer", "arriver"]
+        },
+        {
+          title: "端末設定",
+          description: "CardReaderのIPや各種疎通確認",
+          icon: ["fas", "users"],
+          page: confirm_connection,
+          authority: ["admin"]
         },
         {
           title: "ユーザ管理",

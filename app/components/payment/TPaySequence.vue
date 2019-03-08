@@ -11,7 +11,6 @@
       <p>{{ announceText }}</p>
       <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
       <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
-      <el-button @click="recognization" type="text">決済テスト</el-button>
     </div>
 
     <sweet-modal
@@ -46,7 +45,7 @@ export default {
     changeMethod() {
       if (this.tpay_method == "felica") {
         this.tpay_method = "qr";
-        this.stopCardReader();
+        this.forceQuitReader();
       } else {
         this.tpay_method = "felica";
         this.preparePayment();
@@ -59,19 +58,39 @@ export default {
      ** Start Card Reader
      */
     async preparePayment() {
-      this.reader_timeout = 30000;
+      this.reader_timeout = 10;
       await this.startCardReader(); // フラグを立てる
-      await this.showMessage(["Payment Price", this.totalPrice]);
+      await this.showMessage(["Touch Felica", "Card"]);
 
       while (this.isReading && this.reader_timeout > -1) {
         const response = await this.execCardReader();
+
         this.reader_timeout--;
-        if (response == true) {
+        if (response === true) {
           // IDを取得後、決済開始
           this.connectApi();
           break;
-        } else if (response == null) {
-          this.$ons.notification.alert("CardReader Error!");
+        } else if (response == false) {
+          this.$ons.notification.alert("不明なエラーが発生しました。");
+        } else if (this.reader_timeout <= -1) {
+          // exit timeout
+          this.emissionLED("error");
+          this.isPause = true;
+          await this.showMessage(["Timeout Reader", ""]);
+          await this.stopCardReader();
+
+          this.$ons.notification.confirm({
+            title: "エラー",
+            message: "リーダーがタイムアウトしました",
+            cancelable: true,
+            buttonLabel: ["キャンセル", "再試行"],
+            callback: async index => {
+              if (index == 1) {
+                this.isPause = false;
+                this.preparePayment();
+              }
+            }
+          });
         }
       }
     },
@@ -93,14 +112,18 @@ export default {
         if (response == true) {
           this.recognization();
         } else {
+          this.emissionLED("error");
           let message = "T-Payサーバーとの通信の際に不明なエラーが発生しました";
-          console.log(response);
-
           switch (response) {
             case "Insufficient funds":
+              await this.showMessage([
+                "Balance is under",
+                "the payment price."
+              ]);
               message = "残高不足です。チャージしてください";
               break;
             case "User auth failed":
+              await this.showMessage(["This card is not", "registerd."]);
               message = "このカードは登録されていません";
               break;
             case "Merchant not in auth user":
@@ -108,6 +131,8 @@ export default {
                 "お使いのアカウントはこの店舗で決済を行うことができません";
               break;
           }
+          this.quitReader();
+          this.isReading = false;
           this.loading.close();
           this.$ons.notification.alert(message);
         }
@@ -121,11 +146,13 @@ export default {
           uuid: this.uuid // 決済番号
         })
       ) {
+        this.quitReader();
         this.loading.close();
         this.$emit("pushSuccess");
       } else {
         this.loading.close();
         this.$ons.notification.alert("決済エラーが発生しました");
+        this.quitReader();
       }
     },
     ...mapActions("pos/purchase", ["purchaseCreate"]),
@@ -138,7 +165,10 @@ export default {
       "startCardReader",
       "stopCardReader",
       "execCardReader",
-      "showMessage"
+      "showMessage",
+      "emissionLED",
+      "quitReader",
+      "forceQuitReader"
     ])
   },
   computed: {

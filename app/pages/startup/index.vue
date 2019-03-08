@@ -17,7 +17,7 @@
 
 <script>
 import pos from "~/pages/payment/";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 
 export default {
   data() {
@@ -47,7 +47,12 @@ export default {
       });
     },
     ...mapActions("pos", ["initialize", "getAuthorities", "getProducts"]),
-    ...mapActions("pos/payment-method", ["getPaymentMethod"])
+    ...mapActions("pos/payment-method", ["getPaymentMethod"]),
+    ...mapMutations("localStorage", ["saveReaderIp"]),
+    ...mapMutations("t-pay/card-reader", ["setIp"])
+  },
+  computed: {
+    ...mapGetters("localStorage", ["getReaderIp"])
   },
   async mounted() {
     /**
@@ -57,7 +62,20 @@ export default {
       this.initialize,
       this.getAuthorities,
       this.getProducts,
-      this.getPaymentMethod
+      this.getPaymentMethod,
+      async () => {
+        try {
+          await this.saveReaderIp(
+            this.getReaderIp != ""
+              ? this.getReaderIp
+              : process.env.IDM_READER_HOST
+          );
+          await this.setIp(this.getReaderIp);
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
     ];
 
     for (let i = 0; i < initializeMethods.length; i++) {

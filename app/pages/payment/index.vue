@@ -12,7 +12,7 @@
         :xs="11"
         :sm="7"
         :md="5"
-        :lg="8"
+        :lg="5"
         :xl="5"
         v-for="product in search"
         :key="product.id"
@@ -293,6 +293,6 @@ ons-search-input {
 
 <style lang="scss">
 .page__background {
-  background: url(~assets/images/background.png);
+  // background: url(~assets/images/background.png);
 }
 </style>
