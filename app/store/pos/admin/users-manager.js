@@ -99,7 +99,26 @@ export const actions = {
         }
     },
 
-    async deleteUser({commit, rootState}, id){
-        return true
+    async deleteUser({dispatch, rootState}, id){
+        const response = await this.$axios({
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                ...rootState.pos.admin.auth
+            },
+            url: process.env.POS_HOST+"/users/"+id,
+            timeout: 3000
+        })
+        .catch(err => {
+            return err.response
+        });
+
+        if (response.status == 204 && response.data.success) {
+            await dispatch("getUsers");
+            return true
+        } else {
+            return false
+        }
     }
 }
