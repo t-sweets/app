@@ -9,7 +9,7 @@
     <qriously :value="testURL" :size="200" v-show="method == 'qr'"/>
     <div class="warning">
       <p>{{ announceText }}</p>
-      <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
+      <!-- <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button> -->
     </div>
   </div>
 </template>
@@ -44,11 +44,17 @@ export default {
         this.reader_timeout--;
         if (response === true) {
           // IDを取得後、登録QR発行
+          this.playSE("success");
           this.connectApi();
           break;
-        } else if (this.reader_timeout <= -1) {
+        } else if (response == false) {
+          this.playSE("error");
+          this.$ons.notification.alert("不明なエラーが発生しました。");
+          break;
+        } else if (this.reader_timeout <= -1 && this.isReading) {
           // exit timeout
           this.emissionLED("error");
+          this.playSE("error");
           this.isPause = true;
           await this.showMessage(["Timeout Reader", ""]);
           await this.stopCardReader();
@@ -67,8 +73,7 @@ export default {
               }
             }
           });
-        } else if (response == false) {
-          this.$ons.notification.alert("不明なエラーが発生しました。");
+          break;
         }
       }
     },

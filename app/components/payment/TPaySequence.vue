@@ -10,7 +10,7 @@
     <div class="warning">
       <p>{{ announceText }}</p>
       <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
-      <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button>
+      <!-- <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button> -->
     </div>
 
     <sweet-modal
@@ -71,10 +71,12 @@ export default {
           this.connectApi();
           break;
         } else if (response == false) {
+          this.playSE("error");
           this.$ons.notification.alert("不明なエラーが発生しました。");
-        } else if (this.reader_timeout <= -1) {
+        } else if (this.reader_timeout <= -1 && this.isReading) {
           // exit timeout
           this.emissionLED("error");
+          this.playSE("error");
           this.isPause = true;
           await this.showMessage(["Timeout Reader", ""]);
           await this.stopCardReader();
@@ -112,6 +114,7 @@ export default {
         if (response == true) {
           this.recognization();
         } else {
+          this.playSE("error");
           this.emissionLED("error");
           let message = "T-Payサーバーとの通信の際に不明なエラーが発生しました";
           switch (response) {
@@ -150,6 +153,7 @@ export default {
         this.loading.close();
         this.$emit("pushSuccess");
       } else {
+        this.playSE("error");
         this.loading.close();
         this.$ons.notification.alert("決済エラーが発生しました");
         this.quitReader();

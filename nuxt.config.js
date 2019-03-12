@@ -90,6 +90,16 @@ module.exports = {
       vendor: [
         'vuex',
       ]
+
+      /*
+      ** Import Audio Files
+      */
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        use: 'file-loader',
+        exclude: /(node_modules)/
+      });
+
       /*
        ** Build electron 
        */

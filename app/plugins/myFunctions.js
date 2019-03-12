@@ -1,5 +1,8 @@
 import Vue from 'vue'
 
+import successSound from "~/assets/sounds/success.mp3";
+import errorSound from "~/assets/sounds/error2.mp3";
+
 Vue.mixin({
     methods: {
         dateFormat: (date, format) => {
@@ -15,6 +18,21 @@ Vue.mixin({
             format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
             format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
             return format;
+        },
+        playSE: (method) => {
+            if (!method) return false;
+            let file;
+            switch(method) {
+                case 'success':
+                    file = successSound;
+                    break;
+                case 'error':
+                    file = errorSound;
+                    break;
+            }
+            const audio = new Audio(file);
+            audio.currentTime = 0;
+            audio.play();
         }
     }
 });

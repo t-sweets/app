@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import successSound from "~/assets/sounds/success.mp3";
 export default {
   data() {
     return {
@@ -41,6 +42,8 @@ export default {
   },
   mounted() {
     this.$refs.modal.open();
+    const audioElem = new Audio(successSound);
+    audioElem.play();
   }
 };
 </script>
