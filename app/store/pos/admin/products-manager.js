@@ -106,14 +106,12 @@ export const actions = {
             url: process.env.POS_HOST+"/products/"+id,
             timeout: 1000
         }).catch(err => {
-            return false
+            return err.response
         })
 
-        if (response.status == 200 && response.data.success) {
+        if (response.status == 204 && response.data.success) {
             await commit("deleteProduct", response.data.data.id)
             return true
-        } else if (response.status == 204) {
-            return false
         } else return false;
     },
 }
