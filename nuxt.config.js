@@ -39,7 +39,8 @@ module.exports = {
     '~/plugins/element-ui',
     '~/plugins/sweet-modal',
     '~/plugins/vue-qriously',
-    '~/plugins/myFunctions'
+    '~/plugins/myFunctions',
+    { src: "~/plugins/vuex-persistedstate.js", ssr: false }
   ],
 
   /*
@@ -50,8 +51,7 @@ module.exports = {
     ['@nuxtjs/dotenv',{ filename: '.env.production' }],
     'nuxt-onsenui-module',
     '@nuxtjs/style-resources',
-    'nuxt-fontawesome',
-    'nuxt-vuex-localstorage'
+    'nuxt-fontawesome'
   ],
 
   styleResources: {

@@ -20,7 +20,7 @@
           <el-input v-model="extraConfig.reader_ip"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="saveReaderIp(extraConfig.reader_ip)">Change</el-button>
+          <el-button type="primary" @click="setReaderIp">Change</el-button>
           <el-button @click="resetReaderIp">Reset</el-button>
         </el-form-item>
       </el-form>
@@ -40,12 +40,27 @@ export default {
     };
   },
   methods: {
-    async resetReaderIp() {
-      await this.saveReaderIp("");
+    async setReaderIp() {
+      await this.saveReaderIp(this.extraConfig.reader_ip);
       await this.setIp(
         this.getReaderIp != "" ? this.getReaderIp : process.env.IDM_READER_HOST
       );
       this.extraConfig.reader_ip = this.getReaderIp;
+      this.$notify({
+        title: "IP Changed",
+        message: "Reader's IP address changed.",
+        type: "success"
+      });
+    },
+    async resetReaderIp() {
+      await this.saveReaderIp(process.env.IDM_READER_HOST);
+      await this.setIp(process.env.IDM_READER_HOST);
+      this.extraConfig.reader_ip = process.env.IDM_READER_HOST;
+      this.$notify({
+        title: "IP Changed",
+        message: "Reader's IP address changed.",
+        type: "success"
+      });
     },
     async connect_reader() {
       if (await this.showMessage()) {
@@ -63,6 +78,7 @@ export default {
       }
     },
     ...mapMutations("localStorage", ["saveReaderIp"]),
+    ...mapMutations("t-pay/card-reader", ["setIp"]),
     ...mapActions("pos/payment-method", ["getPaymentMethod"]),
     ...mapActions("t-pay/card-reader", ["showMessage"])
   },
