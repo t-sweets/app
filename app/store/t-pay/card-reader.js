@@ -44,11 +44,9 @@ export const mutations = {
 
 export const actions = {
     async startCardReader({commit, dispatch}) {
-        dispatch("emissionLED", "waiting")
         await commit("setReading", true);
     },
     async stopCardReader({commit, dispatch}) {
-        dispatch("emissionLED")
         await commit("setReading", false);
     },
     /**
@@ -78,11 +76,11 @@ export const actions = {
         if (response.status == 200) {
             await commit("setIDM", response.data.idm)
             await commit("setReading", false)
+            // カードリーダに成功を知らせる
             dispatch("emissionLED", "success")
             dispatch("quitReader")
             return true
         } else if (response.status == 204) {
-            await dispatch("emissionLED")
             return "continue"
         } else {
             await commit("setReading", false)
@@ -140,15 +138,13 @@ export const actions = {
         })
     },
 
-    async quitReader({commit, dispatch}, {callback, time}) {
-        if (!callback) callback = () => { 
-            dispatch("emissionLED")
-            dispatch("showMessage")
-         };
-        if (!time) time = 5000;
+    async quitReader({commit, dispatch}) {
         commit("setWaitExit", {
-            callback: callback,
-            time: time
+            callback: () => {
+                dispatch("emissionLED")
+                dispatch("showMessage")
+            },
+            time: 5000
         })
     },
 

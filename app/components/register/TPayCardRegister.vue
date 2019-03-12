@@ -75,9 +75,11 @@ export default {
           this.registerQR();
           break;
         } else if (response == false) {
+          this.playSE("error");
           this.$ons.notification.alert("不明なエラーが発生しました。");
-        } else if (this.reader_timeout <= -1) {
+        } else if (this.reader_timeout <= -1 && this.isReading) {
           // exit timeout
+          this.playSE("error");
           this.emissionLED("error");
           this.isPause = true;
           await this.showMessage(["Timeout Reader", ""]);
@@ -89,9 +91,13 @@ export default {
             cancelable: true,
             buttonLabel: ["キャンセル", "再試行"],
             callback: async index => {
-              if (index == 1) {
-                this.isPause = false;
-                this.prepareRegister();
+              switch (index) {
+                case 1:
+                  this.isPause = false;
+                  this.prepareRegister();
+                  break;
+                default:
+                  this.postHide();
               }
             }
           });
@@ -101,6 +107,7 @@ export default {
     registerQR() {
       if (this.idm) {
         this.showMessage(["Complete!", ""]);
+        this.playSE("success");
         this.isPause = true; // stop animation
         this.reading = false;
         this.qrURL = `${process.env.TPAY_WEBHOST}?method=register&idm=${
