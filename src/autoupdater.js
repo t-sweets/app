@@ -5,7 +5,7 @@ const {app, autoUpdater, dialog} = require('electron');
 const version = app.getVersion();
 const platform = os.platform() + '_' + os.arch();
 
-const updaterFeedURL = `${process.env.UPDATE_CHECK_NUTS}/${platform}/${version}`;
+const updaterFeedURL = `${process.env.UPDATE_CHECK_NUTS}${platform}/${version}`;
 
 function appUpdater() {
 
