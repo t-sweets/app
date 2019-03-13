@@ -247,7 +247,7 @@ export default {
       this.$refs.productInfo.open("edit");
     },
     async execUpdate() {
-      let data = { stock: this.product.stock + this.form.arrival };
+      let data = { stock: this.form.stock };
       if (this.isChangedCost) data.cost = this.form.cost;
       if (this.isChangedPrice) data.price = this.form.price;
       if (this.isChangedImage)
