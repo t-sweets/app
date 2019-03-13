@@ -26,6 +26,7 @@
             modifier="underbar"
             type="email"
             placeholder="admin@example.com"
+            @keyup.enter="pushLogin"
           ></v-ons-input>
           <br>
           <v-ons-input
@@ -33,6 +34,7 @@
             modifier="underbar"
             placeholder="password"
             type="password"
+            @keyup.enter="pushLogin"
           ></v-ons-input>
           <br>
         </el-main>
@@ -118,6 +120,7 @@ export default {
       this.$refs.modal.open();
     },
     async pushLogin() {
+      document.activeElement.blur();
       if (this.login.userkey && this.login.password) {
         this.$refs.modal.close();
         if (
