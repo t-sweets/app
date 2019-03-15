@@ -41,11 +41,7 @@ export default {
   },
   methods: {
     async setReaderIp() {
-      await this.saveReaderIp(this.extraConfig.reader_ip);
-      await this.setIp(
-        this.getReaderIp != "" ? this.getReaderIp : process.env.IDM_READER_HOST
-      );
-      this.extraConfig.reader_ip = this.getReaderIp;
+      await this.setIp(this.extraConfig.reader_ip);
       this.$notify({
         title: "IP Changed",
         message: "Reader's IP address changed.",
@@ -53,14 +49,8 @@ export default {
       });
     },
     async resetReaderIp() {
-      await this.saveReaderIp(process.env.IDM_READER_HOST);
-      await this.setIp(process.env.IDM_READER_HOST);
       this.extraConfig.reader_ip = process.env.IDM_READER_HOST;
-      this.$notify({
-        title: "IP Changed",
-        message: "Reader's IP address changed.",
-        type: "success"
-      });
+      this.setReaderIp();
     },
     async connect_reader() {
       if (await this.showMessage()) {
@@ -77,7 +67,7 @@ export default {
         });
       }
     },
-    ...mapMutations("localStorage", ["saveReaderIp"]),
+
     ...mapMutations("t-pay/card-reader", ["setIp"]),
     ...mapActions("pos/payment-method", ["getPaymentMethod"]),
     ...mapActions("t-pay/card-reader", ["showMessage"])
@@ -86,10 +76,10 @@ export default {
     ...mapState("pos", ["authority_index"]),
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/admin", ["user"]),
-    ...mapGetters("localStorage", ["getReaderIp"])
+    ...mapState("t-pay/card-reader", ["reader_ip"])
   },
   created() {
-    this.extraConfig.reader_ip = this.getReaderIp;
+    this.extraConfig.reader_ip = this.reader_ip;
   }
 };
 </script>
