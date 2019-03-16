@@ -15,6 +15,9 @@ export const actions = {
   async getMonthlySales({ commit, rootState }, { date, target }) {
     let param;
     switch(target) {
+      case "time":
+        param = `year=${date.getFullYear()}&month=${date.getMonth()+1}&date=${date.getDate()}`
+        break
       case "date":
         param = `year=${date.getFullYear()}&month=${date.getMonth()+1}`
         break

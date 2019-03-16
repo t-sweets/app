@@ -2,7 +2,7 @@
   <v-ons-page>
     <div class="aggregation-target">
       <span>集計対象</span>
-      <el-select v-model="searchForm.target" placeholder="Select" size="small">
+      <el-select v-model="searchForm.target" placeholder="Select" size="small" @change="searchExec">
         <el-option
           v-for="item in target_list"
           :key="item.value"
@@ -17,6 +17,7 @@
         placeholder="Select"
         size="small"
         :clearable="false"
+        @change="searchExec"
       ></el-date-picker>
       <el-date-picker
         v-else-if="this.searchForm.target == 'date'"
@@ -25,6 +26,7 @@
         placeholder="Select"
         size="small"
         :clearable="false"
+        @change="searchExec"
       ></el-date-picker>
       <el-date-picker
         v-else-if="this.searchForm.target == 'month'"
@@ -33,8 +35,9 @@
         placeholder="Select"
         size="small"
         :clearable="false"
+        @change="searchExec"
       ></el-date-picker>
-      <el-button plain style="margin-left: 100px;" size="small" @click="searchExec">表示する</el-button>
+      <!-- <el-button plain style="margin-left: 100px;" size="small" @click="searchExec">表示する</el-button> -->
     </div>
     <bar-chart ref="barChart" :data="graphData" :options="graphOptions"/>
     <el-table
@@ -100,8 +103,9 @@ export default {
         datasets: [
           {
             label: "売上",
-            backgroundColor: "rgba(54, 162, 235, 0.2)",
+            backgroundColor: "rgba(54, 180, 235, 0.3)",
             borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 0.5,
             data: []
           }
         ]
@@ -135,6 +139,11 @@ export default {
       let labels = [];
       if (await this.getMonthlySales(this.searchForm)) {
         switch (this.searchForm.target) {
+          case "time":
+            for (let i = 0; i < 24; i++) {
+              labels.push(i);
+            }
+            break;
           case "date":
             for (
               let i = 0;
@@ -149,6 +158,34 @@ export default {
               labels.push(i + 1);
             }
             break;
+          case "month":
+            labels = [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec"
+            ];
+            break;
+          case "year":
+            let min = 2300,
+              max = 1990;
+            this.sales_data.forEach(data => {
+              const year = new Date(data.created_at).getFullYear();
+              if (year > max) max = year;
+              if (min > year) min = year;
+            });
+            for (let i = min; i <= max; i++) {
+              labels.push(i);
+            }
+            break;
         }
         this.graphData.datasets[0].data = this.dateForGraph;
         this.graphData.labels = labels;
@@ -157,8 +194,17 @@ export default {
     },
     toStrDate(date) {
       switch (this.searchForm.target) {
+        case "time":
+          return this.$nuxt.dateFormat(new Date(date), "MM/DD(E) hh時");
+          break;
         case "date":
           return this.$nuxt.dateFormat(new Date(date), "MM/DD(E)");
+          break;
+        case "month":
+          return this.$nuxt.dateFormat(new Date(date), "YYYY年MM月");
+          break;
+        case "year":
+          return this.$nuxt.dateFormat(new Date(date), "YYYY年");
           break;
       }
       return "";
@@ -172,8 +218,13 @@ export default {
      */
     dateForGraph() {
       let data;
+      let min_year = 2300,
+        max_year = 1990;
       switch (this.searchForm.target) {
         //データを入れる配列を宣言
+        case "time":
+          data = new Array(24);
+          break;
         case "date":
           const created_time = new Date(this.searchForm.date);
           data = new Array(
@@ -184,6 +235,17 @@ export default {
             ).getDate()
           );
           break;
+        case "month":
+          data = new Array(12);
+          break;
+        case "year":
+          this.sales_data.forEach(data => {
+            const year = new Date(data.created_at).getFullYear();
+            if (year > max_year) max_year = year;
+            if (min_year > year) min_year = year;
+          });
+          data = new Array(max_year - min_year + 1);
+          break;
       }
       // 初期値を0に
       for (let i = 0; i < data.length; i++) {
@@ -193,8 +255,18 @@ export default {
       // 取得したデータを格納
       this.sales_data.forEach(item => {
         switch (this.searchForm.target) {
+          case "time":
+            data[new Date(item.created_at).getHours()] += item.sales;
+            break;
           case "date":
             data[new Date(item.created_at).getDate() - 1] += item.sales;
+            break;
+          case "month":
+            data[new Date(item.created_at).getMonth()] += item.sales;
+            break;
+          case "year":
+            data[new Date(item.created_at).getFullYear() - min_year] +=
+              item.sales;
             break;
         }
       });
@@ -204,45 +276,49 @@ export default {
       let data = [];
 
       this.sales_data.forEach(item => {
-        switch (this.searchForm.target) {
-          case "date":
-            let added = false;
-            // すでにlistに存在すれば
-            data.some(column => {
-              if (
-                new Date(column.period).getDate() ==
-                new Date(item.created_at).getDate()
-              ) {
-                column.sales += item.sales;
-                column.counts++;
-                column.avarage = column.sales / column.counts;
-                item.purchase_items.forEach(purchase_items => {
-                  column.quantity += purchase_items.quantity;
-                });
-
-                added = true;
-              } else return false;
+        let added = false;
+        // すでにlistに存在すれば
+        data.some(column => {
+          const period_date = new Date(column.period),
+            created_date = new Date(item.created_at);
+          if (
+            (this.searchForm.target == "time" &&
+              period_date.getHours() == created_date.getHours()) ||
+            (this.searchForm.target == "date" &&
+              period_date.getDate() == created_date.getDate()) ||
+            (this.searchForm.target == "month" &&
+              period_date.getMonth() == created_date.getMonth()) ||
+            (this.searchForm.target == "year" &&
+              period_date.getFullYear() == created_date.getFullYear())
+          ) {
+            column.sales += item.sales;
+            column.counts++;
+            column.avarage = column.sales / column.counts;
+            item.purchase_items.forEach(purchase_items => {
+              column.quantity += purchase_items.quantity;
             });
-            // listになければ新規登録
-            if (!added) {
-              let firstData = {
-                period: item.created_at,
-                sales: item.sales,
-                counts: 1,
-                avarage: item.sales / 1,
-                quantity: 0,
-                payment_method: new Array(this.payment_method.length)
-              };
-              item.purchase_items.forEach(purchase_items => {
-                firstData.quantity += purchase_items.quantity;
-              });
-              for (let i = 0; i < firstData.payment_method.length; i++) {
-                firstData.payment_method[i] =
-                  i + 1 == item.payment_method_id ? 1 : 0;
-              }
-              data.push(firstData);
-            }
-            break;
+
+            added = true;
+          } else return false;
+        });
+        // listになければ新規登録
+        if (!added) {
+          let firstData = {
+            period: item.created_at,
+            sales: item.sales,
+            counts: 1,
+            avarage: item.sales / 1,
+            quantity: 0,
+            payment_method: new Array(this.payment_method.length)
+          };
+          item.purchase_items.forEach(purchase_items => {
+            firstData.quantity += purchase_items.quantity;
+          });
+          for (let i = 0; i < firstData.payment_method.length; i++) {
+            firstData.payment_method[i] =
+              i + 1 == item.payment_method_id ? 1 : 0;
+          }
+          data.push(firstData);
         }
       });
       return data;
