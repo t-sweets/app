@@ -47,13 +47,9 @@ export default {
       });
     },
     ...mapActions("pos", ["initialize", "getAuthorities", "getProducts"]),
-    ...mapActions("pos/payment-method", ["getPaymentMethod"]),
-    ...mapMutations("localStorage", ["saveReaderIp"]),
-    ...mapMutations("t-pay/card-reader", ["setIp"])
+    ...mapActions("pos/payment-method", ["getPaymentMethod"])
   },
-  computed: {
-    ...mapGetters("localStorage", ["getReaderIp"])
-  },
+  computed: {},
   async mounted() {
     /**
      * 起動シークエンス
@@ -62,20 +58,7 @@ export default {
       this.initialize,
       this.getAuthorities,
       this.getProducts,
-      this.getPaymentMethod,
-      async () => {
-        try {
-          await this.saveReaderIp(
-            this.getReaderIp != ""
-              ? this.getReaderIp
-              : process.env.IDM_READER_HOST
-          );
-          await this.setIp(this.getReaderIp);
-          return true;
-        } catch (err) {
-          return false;
-        }
-      }
+      this.getPaymentMethod
     ];
 
     for (let i = 0; i < initializeMethods.length; i++) {
