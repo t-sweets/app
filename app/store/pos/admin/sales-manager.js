@@ -1,10 +1,14 @@
 export const state = () => ({
-  sales_data: []
+  sales_data: [],
+  product_sales: []
 });
 
 export const mutations = {
   setSales(state, data) {
     state.sales_data = data
+  },
+  setProductSales(state, data) {
+    state.product_sales = data
   }
 }
 
@@ -12,7 +16,7 @@ export const actions = {
   /**
    * 商品情報の一覧を取得
    */
-  async getMonthlySales({ commit, rootState }, { date, target }) {
+  async getDailySales({ commit, rootState }, { date, target }) {
     let param;
     switch(target) {
       case "time":
@@ -43,6 +47,30 @@ export const actions = {
 
     if (response.status == 200) {
       commit("setSales", response.data)
+      return true
+    } else {
+      return false
+    }
+  },
+
+  async getProductSales({ commit, rootState }, { product_id, from, to }) {
+    let param = `from=${from}&to=${to}`
+    param += product_id ? `&product_id=${product_id}` : ''
+    const response = await this.$axios({
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+        ...rootState.pos.admin.auth
+      },
+      url: `${process.env.POS_HOST}/purchases/sales?` + param,
+      timeout: 3000
+    }).catch(err => {
+        return err.response
+    });
+
+    if (response.status == 200) {
+      commit("setProductSales", response.data)
       return true
     } else {
       return false

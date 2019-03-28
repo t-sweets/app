@@ -248,11 +248,7 @@ export default {
       return this.isNew ? "password" : "new password";
     },
     hidePassword() {
-      let str = "";
-      for (let i = 0; i < this.form.password.length; i++) {
-        str += "*";
-      }
-      return str;
+      return "*".repeat(this.form.password.length);
     },
     ...mapState("pos", ["authority_index"]),
     ...mapState("pos/admin", ["user"]),

@@ -1,3 +1,5 @@
+let jsonpAdapter = require('axios-jsonp');
+
 export const state = () => ({
     products: []
 });
@@ -104,14 +106,39 @@ export const actions = {
                 ...rootState.pos.admin.auth
             },
             url: process.env.POS_HOST+"/products/"+id,
-            timeout: 1000
+            timeout: 3000
         }).catch(err => {
             return err.response
         })
 
-        if (response.status == 204 && response.data.success) {
+        if (response.status == 200) {
             await commit("deleteProduct", response.data.data.id)
             return true
         } else return false;
     },
+
+    async getProductInfo({commit, store}, jancode) {
+        const response = await this.$axios({
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*"
+            },
+            adapter: jsonpAdapter,
+            url: process.env.YAHOODEV_REQUEST_URL,
+            params: {
+                appid: process.env.YAHOODEV_CLIENT_ID,
+                jan: jancode,
+                hits: 1
+            },
+            crossDomain: true,
+            timeout: 3000
+        }).catch(err => {
+            return err.response
+        })
+
+        if (response.status == 200 && response.data.ResultSet.totalResultsReturned) {
+            return response.data.ResultSet[0].Result[0];
+        } else return false;
+    }
 }

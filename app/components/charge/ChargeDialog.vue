@@ -257,24 +257,6 @@ export default {
 
 
 <style lang="scss">
-.total-dialog {
-  .dialog {
-    width: 90%;
-    // bottom: 0;
-    // top: auto;
-    // transform: translate(-50%, 0);
-    ons-button.cancel-button {
-      color: #555;
-      cursor: pointer;
-    }
-  }
-  @media screen and (min-width: 1024px) {
-    .dialog {
-      width: 60%;
-    }
-  }
-}
-
 .charge-price {
   .el-input-number {
     .el-input {

@@ -1,5 +1,10 @@
 <template>
-  <v-ons-dialog class="total-dialog" cancelable :visible="isShowTotal" @posthide="change(false)">
+  <v-ons-dialog
+    id="totalAccount"
+    class="total-dialog"
+    :visible="isShowTotal"
+    @posthide="change(false)"
+  >
     <el-row class="nav">
       <el-col :span="4">
         <v-ons-button
@@ -49,7 +54,7 @@
             <el-button
               type="primary"
               round
-              @click="paymethod = method.uuid"
+              @click="selectPaymentMethod(method.uuid)"
               icon="el-icon-message"
             >{{ method.name }}</el-button>
           </el-col>
@@ -74,7 +79,7 @@
 <script>
 import TPay from "~/components/payment/TPaySequence";
 import Cash from "~/components/payment/CashSequence";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -97,6 +102,11 @@ export default {
     reSelect() {
       this.paymethod = undefined;
     },
+    async selectPaymentMethod(uuid) {
+      if (await this.purchaseCheck()) {
+        this.paymethod = uuid;
+      }
+    },
     pushSuccess() {
       this.$emit("pushSuccess");
     },
@@ -106,7 +116,8 @@ export default {
       )
         ? path
         : process.env.POS_HOST + "/../.." + path;
-    }
+    },
+    ...mapActions("pos/purchase", ["purchaseCheck"])
   },
   components: {
     TPay,
@@ -257,7 +268,7 @@ export default {
   }
   @media screen and (min-width: 1024px) {
     .dialog {
-      width: 60%;
+      width: 80%;
     }
   }
 }
