@@ -137,26 +137,26 @@ export default {
   methods: {
     async searchExec() {
       let labels = [];
-      if (await this.getMonthlySales(this.searchForm)) {
+      if (await this.getDailySales(this.searchForm)) {
         switch (this.searchForm.target) {
           case "time":
-            for (let i = 0; i < 24; i++) {
+            [...new Array(24)].map((v, i) => {
               labels.push(i);
-            }
+            });
             break;
           case "date":
-            for (
-              let i = 0;
-              i <
-              new Date(
-                this.searchForm.date.getFullYear(),
-                this.searchForm.date.getMonth() + 1,
-                0
-              ).getDate();
-              i++
-            ) {
+            [
+              ...new Array(
+                new Date(
+                  this.searchForm.date.getFullYear(),
+                  this.searchForm.date.getMonth() + 1,
+                  0
+                ).getDate()
+              )
+            ].map((v, i) => {
               labels.push(i + 1);
-            }
+            });
+
             break;
           case "month":
             labels = [
@@ -182,9 +182,7 @@ export default {
               if (year > max) max = year;
               if (min > year) min = year;
             });
-            for (let i = min; i <= max; i++) {
-              labels.push(i);
-            }
+            [...new Array(max - min + 1)].map((v, i) => labels.push(min + i));
             break;
         }
         this.graphData.datasets[0].data = this.dateForGraph;
@@ -210,7 +208,7 @@ export default {
       return "";
     },
 
-    ...mapActions("pos/admin/sales-manager", ["getMonthlySales"])
+    ...mapActions("pos/admin/sales-manager", ["getDailySales"])
   },
   computed: {
     /*
@@ -248,9 +246,10 @@ export default {
           break;
       }
       // 初期値を0に
-      for (let i = 0; i < data.length; i++) {
-        data[i] = 0;
-      }
+      data.fill(0);
+      // for (let i = 0; i < data.length; i++) {
+      //   data[i] = 0;
+      // }
 
       // 取得したデータを格納
       this.sales_data.forEach(item => {
