@@ -19,6 +19,30 @@ Vue.mixin({
             format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
             return format;
         },
+        jancodeValidate: (jancode) => {
+            if (!jancode || jancode == "") return false;
+
+            let nums = jancode.split('');
+            const checkdigit = nums[nums.length-1];            
+            nums = nums.filter((num, index) => {
+                return index != nums.length-1
+            })
+
+            let even = 0;
+            let odd = 0;
+            try {
+                nums.forEach((num, index) => {
+                    if (index % 2 === 0) odd += parseInt(num);
+                    else even += parseInt(num);
+                });
+                const digit = 10 - parseInt((even * 3 + odd + "").slice(-1));
+                console.log(checkdigit);
+                
+                return (digit < 10 ? digit : 0) == checkdigit
+            } catch (e) {
+                return false;
+            }
+        },
         playSE: (method) => {
             if (!method) return false;
             let file;

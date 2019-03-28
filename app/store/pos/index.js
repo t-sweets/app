@@ -104,6 +104,14 @@ export const mutations = {
                 ...data
             }
         });
+    },
+
+    productToBegining(state, product) {
+        let products = state.products.filter(_product => {
+            return _product.id != product.id
+        })
+        products.unshift(product);
+        state.products = products;
     }
 }
 
@@ -153,10 +161,10 @@ export const actions = {
                 ...state.auth
             },
             url: process.env.POS_HOST +"/authorities",
-            timeout: 1000
+            timeout: 3000
         })
         .catch(err => {
-            return false
+            return err.response
         });
 
         if (response.status == 200) {
@@ -178,12 +186,37 @@ export const actions = {
             timeout: 3000
         })
         .catch(err => {
-            return false
+            return err.response
         });
 
         if (response.status == 200) {
             commit("setProducts", response.data)
             return true
+        } else {
+            return false
+        }
+    },
+
+    async getProductWithReader({commit, state}, jancode) {
+        // return state.products[0];
+        if (!jancode) return false;
+        const response = await this.$axios({
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+                ...state.auth
+            },
+            url: process.env.POS_HOST +"/products/jan/"+ jancode,
+            timeout: 3000
+        })
+        .catch(err => {
+            return err.response
+        });
+
+        if (response.status == 200) {
+            await commit("productToBegining",response.data);
+            return response.data
         } else {
             return false
         }

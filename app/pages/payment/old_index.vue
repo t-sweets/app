@@ -6,6 +6,7 @@
       </div>
       <div class="center">商品一覧</div>
     </v-ons-toolbar>
+    <v-ons-search-input placeholder="商品を検索" v-model="search_str"></v-ons-search-input>
     <el-row>
       <el-col
         :xs="11"
@@ -70,8 +71,7 @@ export default {
   data() {
     return {
       search_str: "",
-      isShowTotal: false,
-      jancode: ""
+      isShowTotal: false
     };
   },
   components: {
@@ -82,40 +82,17 @@ export default {
     /*
      ** 商品をカートに追加する
      */
-    async addCart(product) {
-      const quantity = await this.getQuantity(product.id);
-      if (quantity > 0) {
-        this.cart.some((item, index) => {
-          if (item.id == product.id) {
-            this.setQuantity({ index: index, quantity: quantity + 1 });
-            return true;
-          }
-        });
-      } else
-        this.setProduct({
-          id: product.id,
-          name: product.name,
-          quantity: 1,
-          price: product.price
-        });
-    },
-
-    /**
-     * リーダスキャンして商品追加
-     */
-    async addCartWithReader() {
-      const product = await this.getProductWithReader(this.jancode);
-      this.jancode = "";
-      if (!product) return false;
-      this.$refs.prod.some((item, index) => {
-        if (item.product.id == product.id) {
-          this.$refs.prod[index].quantity += 1;
+    addCart(product) {
+      let isExist = false;
+      this.cart.some((item, index) => {
+        if (item.id == product.id) {
+          isExist = !isExist;
+          this.setQuantity({ index: index, quantity: product.quantity });
           return true;
         }
       });
-      this.addCart(product);
+      if (!isExist) this.setProduct(product);
     },
-
     /*
      ** 商品をカートから削除
      */
@@ -133,6 +110,7 @@ export default {
           return true;
         }
       });
+      if (this.cart.length < 1) this.showTotal(false);
     },
     /*
      ** カートの内容をリセット
@@ -187,24 +165,7 @@ export default {
     backMenu() {
       this.showTotal(false);
       this.resetCart();
-      this.enableCodeReader(false);
       this.$emit("pop-page", MenuPage);
-    },
-
-    enableCodeReader(bool) {
-      if (bool) {
-        document.onkeydown = e => {
-          const key = e.key;
-          if (key !== "Enter") this.jancode += key;
-          else {
-            if (this.jancode.length == 13 || this.jancode.length == 8)
-              this.addCartWithReader();
-            else this.jancode = "";
-          }
-        };
-      } else {
-        document.onkeydown = () => {};
-      }
     },
 
     ...mapMutations("pos/purchase", [
@@ -214,8 +175,8 @@ export default {
       "setQuantity",
       "resetProduct"
     ]),
-    ...mapActions("pos", ["getProducts", "getProductWithReader"]),
-    ...mapActions("pos/purchase", ["purchaseCheck", "getQuantity"])
+    ...mapActions("pos", ["getProducts"]),
+    ...mapActions("pos/purchase", ["purchaseCheck"])
   },
   computed: {
     /*
@@ -279,11 +240,6 @@ export default {
   mounted() {
     const transactionUUID = uuidv4();
     this.setUUID(transactionUUID);
-
-    /**
-     * バーコードリーダをオン
-     */
-    this.enableCodeReader(true);
   }
 };
 </script>

@@ -23,8 +23,8 @@ export const mutations = {
     /*
      ** 商品の数量を設定する
      */
-    setQuantity(state, data) {
-        state.cart[data.index].quantity = data.quantity
+    setQuantity(state, {index, quantity}) {
+        state.cart[index].quantity = quantity
     },
     /*
      ** カートを初期化する
@@ -180,5 +180,11 @@ export const actions = {
         } else return false;
     },
 
+    async getQuantity({state}, id) {
+        const product = await state.cart.filter(item => {
+            return item.id == id
+        })
+        return product.length ? product[0].quantity : 0;
+    }
 
 }

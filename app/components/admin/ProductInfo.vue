@@ -6,6 +6,9 @@
           <el-form-item label="商品名">
             <p class="form-text">{{ product.name }}</p>
           </el-form-item>
+          <el-form-item label="JANコード">
+            <p class="form-text">{{ product.jan }}</p>
+          </el-form-item>
           <el-form-item label="商品画像">
             <el-col :span="11">
               <img :src="toImageUrl" class="product-confirm-image">
@@ -39,6 +42,9 @@
         <el-form ref="form" :model="form" label-width="200px" label-position="left">
           <el-form-item label="商品名" :required="true">
             <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="商品名" :required="true">
+            <el-input v-model="form.jan"></el-input>
           </el-form-item>
           <el-form-item label="商品" :required="true">
             <el-col :span="11">
@@ -102,6 +108,15 @@
             <el-col class="line" :span="2">=></el-col>
             <el-col :span="11">
               <p class="form-text" style="font-weight:bold;">{{ form.name }}</p>
+            </el-col>
+          </el-form-item>
+          <el-form-item label="JANコード">
+            <el-col :span="8">
+              <p class="form-text">{{ product.jan }}</p>
+            </el-col>
+            <el-col class="line" :span="2">=></el-col>
+            <el-col :span="11">
+              <p class="form-text" style="font-weight:bold;">{{ form.jan }}</p>
             </el-col>
           </el-form-item>
           <el-form-item label="画像（変更前 => 変更後）">
@@ -193,6 +208,7 @@ export default {
       },
       form: {
         name: "",
+        jan: "",
         price: 0,
         cost: 0,
         stock: 0,
@@ -248,6 +264,8 @@ export default {
     },
     async execUpdate() {
       let data = { stock: this.form.stock };
+      if (this.isChangedName) data.name = this.form.name;
+      if (this.isChangedJancode) data.jan = this.form.jan;
       if (this.isChangedCost) data.cost = this.form.cost;
       if (this.isChangedPrice) data.price = this.form.price;
       if (this.isChangedImage)
@@ -315,6 +333,12 @@ export default {
     },
     toImageData() {
       return this.form.image ? "data:image/png;base64," + this.form.image : "";
+    },
+    isChangedName() {
+      return this.product.name !== this.form.name ? true : false;
+    },
+    isChangedJancode() {
+      return this.product.jan !== this.form.jan ? true : false;
     },
     isChangedCost() {
       return this.product.cost !== this.form.cost ? true : false;

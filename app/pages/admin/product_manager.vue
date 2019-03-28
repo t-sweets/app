@@ -44,7 +44,10 @@
           <el-col :span="4">
             <el-button class="tab-button" @click="$refs.createModal.open()">商品の追加</el-button>
           </el-col>
-          <el-col :span="20">
+          <el-col :span="4">
+            <el-button class="tab-button" @click="getProductList">商品情報更新</el-button>
+          </el-col>
+          <el-col :span="16">
             <div style="width:100%;height:10px;"></div>
           </el-col>
         </el-row>
@@ -54,7 +57,7 @@
 
     <product-info ref="productInfoModal"/>
     <arrival-product ref="arrivalModal"/>
-    <create-product ref="createModal"/>
+    <create-product ref="createModal" @getProductList="getProductList"/>
   </v-ons-page>
 </template>
 
@@ -83,6 +86,15 @@ export default {
     toDisplay(bool) {
       return bool ? "true" : "false";
     },
+    async getProductList() {
+      if (await this.getProducts()) {
+      } else {
+        this.$ons.notification.alert({
+          title: "通信エラー",
+          message: "商品リストを取得できませんでした"
+        });
+      }
+    },
     ...mapActions("pos/admin/products-manager", ["getProducts"])
   },
   computed: {
@@ -105,13 +117,7 @@ export default {
     })
   },
   async mounted() {
-    if (await this.getProducts()) {
-    } else {
-      this.$ons.notification.alert({
-        title: "通信エラー",
-        message: "商品リストを取得できませんでした"
-      });
-    }
+    await this.getProductList();
   }
 };
 </script>
