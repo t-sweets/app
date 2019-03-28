@@ -54,6 +54,7 @@
     "sass-loader": "^7.1.0",
     "sweet-modal-vue": "^2.0.0",
     "uuid": "^3.3.2",
+    "vue-chartjs": "^3.4.0",
     "vue-qriously": "^1.1.1",
     "vuex-persistedstate": "^2.5.4"
   },
