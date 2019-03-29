@@ -25,6 +25,22 @@
         </el-form-item>
       </el-form>
     </el-card>
+
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
+        <p style="float: left">Receipt Printer</p>
+        <el-button style="float: right" type="primary" @click="connect_printer">Connect</el-button>
+      </div>
+      <el-form ref="form" :model="extraConfig" label-width="120px">
+        <el-form-item label="IP Address">
+          <el-input v-model="extraConfig.printer_ip"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="setPrinterIp">Change</el-button>
+          <el-button @click="resetPrinterIp">Reset</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </v-ons-page>
 </template>
 
@@ -35,7 +51,8 @@ export default {
   data() {
     return {
       extraConfig: {
-        reader_ip: ""
+        reader_ip: "",
+        printer_ip: ""
       }
     };
   },
@@ -68,18 +85,50 @@ export default {
       }
     },
 
+    async setPrinterIp() {
+      await this.set_printer_ip(this.extraConfig.printer_ip);
+      this.$notify({
+        title: "IP Changed",
+        message: "Printer's IP address changed.",
+        type: "success"
+      });
+    },
+    async resetPrinterIp() {
+      this.extraConfig.printer_ip = process.env.PRINTER_HOST;
+      this.setPrinterIp();
+    },
+    async connect_printer() {
+      if (await this.testPrint()) {
+        this.$notify({
+          title: "Success",
+          message: "Receipt Printer is Connection Success",
+          type: "success"
+        });
+      } else {
+        this.$notify({
+          title: "Error",
+          message: "Connection refused",
+          type: "error"
+        });
+      }
+    },
+
     ...mapMutations("t-pay/card-reader", ["setIp"]),
+    ...mapMutations("pos/receipt-printer", ["set_printer_ip"]),
     ...mapActions("pos/payment-method", ["getPaymentMethod"]),
-    ...mapActions("t-pay/card-reader", ["showMessage"])
+    ...mapActions("t-pay/card-reader", ["showMessage"]),
+    ...mapActions("pos/receipt-printer", ["testPrint"])
   },
   computed: {
     ...mapState("pos", ["authority_index"]),
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/admin", ["user"]),
-    ...mapState("t-pay/card-reader", ["reader_ip"])
+    ...mapState("t-pay/card-reader", ["reader_ip"]),
+    ...mapState("pos/receipt-printer", ["printer_ip"])
   },
   created() {
     this.extraConfig.reader_ip = this.reader_ip;
+    this.extraConfig.printer_ip = this.printer_ip;
   }
 };
 </script>
