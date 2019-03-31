@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -62,48 +62,39 @@ export default {
      ** Start Card Reader
      */
     async prepareRegister() {
-      this.reader_timeout = 10;
-      await this.startCardReader(); // フラグを立てる
       await this.showMessage(["Touch Felica", "Card"]);
 
-      while (this.isReading && this.reader_timeout > -1) {
-        const response = await this.execCardReader();
+      // リーダへのリクエスト開始
+      const response = await this.execCardReader();
 
-        this.reader_timeout--;
-        if (response === true) {
-          // IDを取得後、登録QR発行
-          this.registerQR();
-          break;
-        } else if (response == false) {
-          this.playSE("error");
-          this.$ons.notification.alert("不明なエラーが発生しました。");
-        } else if (this.reader_timeout <= -1 && this.isReading) {
-          // exit timeout
-          this.playSE("error");
-          this.emissionLED("error");
-          this.isPause = true;
-          await this.showMessage(["Timeout Reader", ""]);
-          await this.stopCardReader();
-
-          this.$ons.notification.confirm({
-            title: "エラー",
-            message: "リーダーがタイムアウトしました",
-            cancelable: true,
-            buttonLabel: ["キャンセル", "再試行"],
-            callback: async index => {
-              switch (index) {
-                case 1:
-                  this.isPause = false;
-                  this.prepareRegister();
-                  break;
-                default:
-                  this.postHide();
-              }
+      if (response === true) {
+        this.registerQR();
+      } else if (response === false) {
+        this.playSE("error");
+        this.$ons.notification.alert("不明なエラーが発生しました。");
+      } else if (response === 408) {
+        this.playSE("error");
+        this.isPause = true;
+        await this.showMessage(["Timeout Reader", ""]);
+        this.$ons.notification.confirm({
+          title: "エラー",
+          message: "リーダーがタイムアウトしました",
+          cancelable: true,
+          buttonLabel: ["キャンセル", "再試行"],
+          callback: async index => {
+            switch (index) {
+              case 1:
+                this.isPause = false;
+                this.prepareRegister();
+                break;
+              default:
+                this.postHide();
             }
-          });
-        }
+          }
+        });
       }
     },
+
     registerQR() {
       if (this.idm) {
         this.showMessage(["Complete!", ""]);
@@ -129,12 +120,11 @@ export default {
       this.prepareRegister();
     },
     async postHide() {
-      await this.stopCardReader();
+      this.setStatus("pending");
       this.$emit("backMenu");
     },
+    ...mapMutations("t-pay/card-reader", ["setStatus"]),
     ...mapActions("t-pay/card-reader", [
-      "startCardReader",
-      "stopCardReader",
       "execCardReader",
       "showMessage",
       "emissionLED"
