@@ -1,5 +1,5 @@
 <template>
-  <v-ons-page>
+  <v-ons-page id="product-list">
     <v-ons-toolbar>
       <div class="left">
         <v-ons-back-button @click.prevent="backMenu"></v-ons-back-button>
@@ -113,6 +113,7 @@ export default {
           return true;
         }
       });
+      this.productToHeadAndScroll(product);
       this.addCart(product);
     },
 
@@ -145,6 +146,14 @@ export default {
       });
     },
 
+    /**
+     * 先頭に並び替える際に先頭へスクロール
+     */
+    productToHeadAndScroll(product) {
+      this.productToHead(product);
+      document.querySelector("#product-list>.page__content").scrollTop = 0;
+    },
+
     /*
      ** 関数から決済パネルの表示非表示を定める
      */
@@ -163,11 +172,12 @@ export default {
                 this.getProducts();
               }
             });
-            return -1;
+            return false;
           }
         }
-        this.isShowTotal = bool;
       }
+      this.enableCodeReader(!bool);
+      this.isShowTotal = bool;
     },
 
     /*
@@ -207,6 +217,7 @@ export default {
       }
     },
 
+    ...mapMutations("pos", ["productToHead"]),
     ...mapMutations("pos/purchase", [
       "setUUID",
       "setProduct",

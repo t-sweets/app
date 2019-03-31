@@ -48,7 +48,7 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/axios',
-    ['@nuxtjs/dotenv',{ filename: '.env' }],
+    ['@nuxtjs/dotenv',{ filename: '.env.production' }],
     'nuxt-onsenui-module',
     '@nuxtjs/style-resources',
     'nuxt-fontawesome'
