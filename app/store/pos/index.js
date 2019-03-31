@@ -106,7 +106,7 @@ export const mutations = {
         });
     },
 
-    productToBegining(state, product) {
+    productToHead(state, product) {
         let products = state.products.filter(_product => {
             return _product.id != product.id
         })
@@ -215,7 +215,7 @@ export const actions = {
         });
 
         if (response.status == 200) {
-            await commit("productToBegining",response.data);
+            // await commit("productToBegining",response.data);
             return response.data
         } else {
             return false
