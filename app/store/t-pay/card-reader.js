@@ -5,11 +5,6 @@ export const state = () => ({
         line_1: "",
         line_2: ""
     },
-    isReading: false,
-    exitTimeout: {
-        callback: null,
-        timeout: null
-    },
     status: 'pending',
 });
 
@@ -32,19 +27,6 @@ export const mutations = {
     setStatus(state, status) {
         state.status = status
     },
-
-    setReading(state, bool) {
-        state.isReading = bool
-    },
-
-    setWaitExit(state, {callback, time}) {
-        state.exitTimeout.callback = callback ? callback : () => {}
-        state.exitTimeout.timeout = setTimeout(state.exitTimeout.callback, time ? time : 5000)
-    },
-
-    forceExit(state) {
-        clearTimeout(state.exitTimeout.timeout);
-    }
 }
 
 export const actions = {
@@ -97,56 +79,17 @@ export const actions = {
         console.log(response);
         
         if (response === true) {
-            dispatch("emissionLED", "success")
+            await dispatch("emissionLED", "success")
+            await dispatch("showMessage", ["Success!", " "])
+            dispatch("autoHide", 5000)
             return response
         } else if (response === false || response === 408) {
-            dispatch("emissionLED", "error")
+            await dispatch("emissionLED", "error")
+            await dispatch("showMessage", ["Error", " "])
+            dispatch("autoHide", 5000)
             return response
         }
-    },
-        
-
-        
-
-
-    /**
-     * カードリーダを起動
-     */
-    async execCardReader2({commit, state, dispatch}) {
-        dispatch("emissionLED", "waiting")
-        
-        const response = await this.$axios({
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8",
-                "Access-Control-Allow-Origin": "*",
-            },
-            url: state.reader_ip + "api/v1/card",
-            timeout : 5000,
-        }).catch(err => {
-            commit("setReading", false)
-            return err.response
-        })
-        
-        if (!response) {
-            await dispatch("emissionLED", "error")
-            await commit("setReading", false)
-            return false
-        }
-        if (response.status == 200) {
-            await commit("setIDM", response.data.idm)
-            await commit("setReading", false)
-            // カードリーダに成功を知らせる
-            dispatch("emissionLED", "success")
-            dispatch("quitReader")
-            return true
-        } else if (response.status == 204) {
-            return "continue"
-        } else {
-            await commit("setReading", false)
-            await dispatch("emissionLED", "error")
-            return false
-        }
+        dispatch("autoHide", 0)
     },
 
 
@@ -198,19 +141,12 @@ export const actions = {
         })
     },
 
-    async quitReader({commit, dispatch}) {
-        commit("setWaitExit", {
-            callback: () => {
+    autoHide({state, dispatch}, timeout) {
+        setTimeout(() => {
+            if (state.status == "pending") {
                 dispatch("emissionLED")
                 dispatch("showMessage")
-            },
-            time: 5000
-        })
-    },
-
-    async forceQuitReader({commit, state}) {
-        commit("forceExit")
-        commit("setReading", false);
-        await state.exitTimeout.callback()
+            }
+        }, timeout);
     }
 }

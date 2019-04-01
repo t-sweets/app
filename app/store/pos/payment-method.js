@@ -66,5 +66,16 @@ export const actions = {
             return false
         }
 
+    },
+
+    async convertUUIDtoName({state}, uuid){
+        let name = null;
+        await state.payment_method.some(async method => {
+            if (method.uuid == uuid) {
+                name = method.name
+                return true
+            } return false;
+        })
+        return name;
     }
 }

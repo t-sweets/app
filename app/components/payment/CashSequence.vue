@@ -6,7 +6,7 @@
     </div>
     <div class="change">
       <div class="title">おつり</div>
-      <div class="change">¥{{ total - totalPrice }}</div>
+      <div class="change">¥{{ change }}</div>
     </div>
     <div class="calc-buttons">
       <div class="calc-button" v-for="num in calcButtons" :key="num">
@@ -29,6 +29,7 @@ export default {
       calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0]
     };
   },
+  props: ["items"],
   methods: {
     reSelect() {
       this.$emit("reSelect");
@@ -59,13 +60,30 @@ export default {
         })
       ) {
         this.loading.close();
-        this.$emit("pushSuccess");
+        this.prepareSuccess();
       } else {
         this.loading.close();
         this.$ons.notification.alert("決済エラーが発生しました");
       }
     },
-    ...mapActions("pos/purchase", ["purchaseCreate"])
+
+    async prepareSuccess() {
+      //レシート発行をして、pushSuccess
+      const params = {
+        total_price: parseInt(this.totalPrice),
+        payment_data: {
+          payment_method: "cash",
+          cash: parseInt(this.total),
+          change: parseInt(this.change)
+        },
+        products: this.items
+      };
+      this.printReceipt(params);
+      this.$emit("pushSuccess");
+    },
+
+    ...mapActions("pos/purchase", ["purchaseCreate"]),
+    ...mapActions("pos/receipt-printer", ["printReceipt"])
   },
   computed: {
     method() {
@@ -84,6 +102,9 @@ export default {
     },
     paymentable() {
       return this.total - this.totalPrice >= 0 ? true : false;
+    },
+    change() {
+      return this.total - this.totalPrice;
     },
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"])

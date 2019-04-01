@@ -9,7 +9,7 @@ export const mutations = {
 }
 
 export const actions = {
-    async printReceipt({state}, {date, total_price, payment_data, products}) {
+    async printReceipt({state}, {total_price, payment_data, products}) {
         const response = await this.$axios({
             method: "POST",
             headers: {
@@ -18,7 +18,7 @@ export const actions = {
             },
             data: {
                 icon: "images/icon.png",
-                date: $nuxt.dateFormat(new Date(date), 'YYYY/MM/DD(E) hh:mm'),
+                date: $nuxt.dateFormat(new Date(), 'YYYY/MM/DD(E) hh:mm'),
                 total_price: total_price,
                 ...payment_data,
                 items: products 
