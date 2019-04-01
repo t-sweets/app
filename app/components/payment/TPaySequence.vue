@@ -1,5 +1,8 @@
 <template>
   <div class="tutorial">
+    <div class="requireReceipt">
+      <el-checkbox v-model="isReceiptIssue">レシートを発行する</el-checkbox>
+    </div>
     <div class="animation" v-show="tpay_method == 'felica'">
       <div class="handbox">
         <img class="hand" :class="{pause: isPause}" src="~/assets/images/felica_hand.svg" alt>
@@ -36,7 +39,8 @@ export default {
     return {
       isPause: false,
       tpay_method: "felica",
-      testURL: "http://www.google.com"
+      testURL: "http://www.google.com",
+      isReceiptIssue: true
     };
   },
   props: ["items"],
@@ -149,18 +153,18 @@ export default {
 
     async prepareSuccess() {
       //レシート発行をして、pushSuccess
-      const params = {
-        total_price: parseInt(this.totalPrice),
-        payment_data: {
-          payment_method: "tpay",
-          customer_id: `**** **** **** ${this.idm.slice(-4)}`,
-          balance: this.before_payment.balance // あとで対応
-        },
-        products: this.items
-      };
-      console.log(params);
-
-      this.printReceipt(params);
+      if (this.isReceiptIssue) {
+        const params = {
+          total_price: parseInt(this.totalPrice),
+          payment_data: {
+            payment_method: "tpay",
+            customer_id: `**** **** **** ${this.idm.slice(-4)}`,
+            balance: this.before_payment.balance // あとで対応
+          },
+          products: this.items
+        };
+        this.printReceipt(params);
+      }
 
       this.$emit("pushSuccess");
     },
@@ -226,6 +230,10 @@ export default {
   }
   display: inline-block;
   text-align: center;
+  .requireReceipt {
+    text-align: right;
+    margin-right: 50px;
+  }
 }
 
 .animation {

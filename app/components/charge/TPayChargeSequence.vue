@@ -72,9 +72,11 @@ export default {
         lock: false
       });
       if (await this.getApiToken()) {
+        this.playSE("success");
         this.loading.close();
         this.$emit("amountsInput");
       } else {
+        this.playSE("error");
         this.loading.close();
         this.$ons.notification.alert("t-payサーバーとの通信に失敗しました");
       }
