@@ -10,7 +10,6 @@
     <div class="warning">
       <p>{{ announceText }}</p>
       <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
-      <!-- <el-button @click="changeMethod" type="text">{{ changeMethodText }}</el-button> -->
     </div>
 
     <sweet-modal
@@ -30,7 +29,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, mapMutations } from "vuex";
 
 export default {
   data() {
@@ -45,55 +44,46 @@ export default {
     changeMethod() {
       if (this.tpay_method == "felica") {
         this.tpay_method = "qr";
-        this.forceQuitReader();
+        this.setStatus("pending");
       } else {
         this.tpay_method = "felica";
         this.preparePayment();
       }
     },
     reSelect() {
+      this.setStatus("pending");
       this.$emit("reSelect");
     },
     /*
      ** Start Card Reader
      */
     async preparePayment() {
-      this.reader_timeout = 10;
-      await this.startCardReader(); // フラグを立てる
       await this.showMessage(["Touch Felica", "Card"]);
 
-      while (this.isReading && this.reader_timeout > -1) {
-        const response = await this.execCardReader();
+      // リーダへのリクエスト開始
+      const response = await this.execCardReader();
 
-        this.reader_timeout--;
-        if (response === true) {
-          // IDを取得後、決済開始
-          this.connectApi();
-          break;
-        } else if (response == false) {
-          this.playSE("error");
-          this.$ons.notification.alert("不明なエラーが発生しました。");
-        } else if (this.reader_timeout <= -1 && this.isReading) {
-          // exit timeout
-          this.emissionLED("error");
-          this.playSE("error");
-          this.isPause = true;
-          await this.showMessage(["Timeout Reader", ""]);
-          await this.stopCardReader();
-
-          this.$ons.notification.confirm({
-            title: "エラー",
-            message: "リーダーがタイムアウトしました",
-            cancelable: true,
-            buttonLabel: ["キャンセル", "再試行"],
-            callback: async index => {
-              if (index == 1) {
-                this.isPause = false;
-                this.preparePayment();
-              }
+      if (response === true) {
+        this.connectApi();
+      } else if (response === false) {
+        this.playSE("error");
+        this.$ons.notification.alert("不明なエラーが発生しました。");
+      } else if (response === 408) {
+        this.playSE("error");
+        this.isPause = true;
+        await this.showMessage(["Timeout Reader", ""]);
+        this.$ons.notification.confirm({
+          title: "エラー",
+          message: "リーダーがタイムアウトしました",
+          cancelable: true,
+          buttonLabel: ["キャンセル", "再試行"],
+          callback: async index => {
+            if (index == 1) {
+              this.isPause = false;
+              this.preparePayment();
             }
-          });
-        }
+          }
+        });
       }
     },
 
@@ -166,14 +156,12 @@ export default {
       "checkoutWithFelica"
     ]),
     ...mapActions("t-pay/card-reader", [
-      "startCardReader",
-      "stopCardReader",
       "execCardReader",
       "showMessage",
       "emissionLED",
-      "quitReader",
-      "forceQuitReader"
-    ])
+      "quitReader"
+    ]),
+    ...mapMutations("t-pay/card-reader", ["setStatus"])
   },
   computed: {
     changeMethodText() {

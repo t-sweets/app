@@ -9,7 +9,8 @@ export const state = () => ({
     exitTimeout: {
         callback: null,
         timeout: null
-    }
+    },
+    status: 'pending',
 });
 
 export const mutations = {
@@ -28,6 +29,10 @@ export const mutations = {
         state.idm = null;
     },
 
+    setStatus(state, status) {
+        state.status = status
+    },
+
     setReading(state, bool) {
         state.isReading = bool
     },
@@ -43,16 +48,71 @@ export const mutations = {
 }
 
 export const actions = {
-    async startCardReader({commit, dispatch}) {
-        await commit("setReading", true);
+    async readFelica({commit, dispatch, state}, REQUEST_COUNT) {
+        if (REQUEST_COUNT < 0) return 408;
+        const response = await this.$axios({
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Access-Control-Allow-Origin": "*",
+            },
+            url: state.reader_ip + "api/v1/card",
+            timeout : 5000,
+        }).catch(async err => {
+            // 通信タイムアウトの場合、通信切断
+            if (err.code == 'ECONNABORTED') return {
+                status: 408
+            }
+            return err.response
+        })
+
+        if (response && state.status != 'busy') return 'cancel';
+
+        if (response.status == 200) {
+            await commit("setIDM", response.data.idm);
+            await commit("setStatus", 'pending')
+            return true
+        } else if (response.status == 204) {
+            new Promise(resolve => setTimeout(resolve, 1000))
+            return await dispatch("readFelica", REQUEST_COUNT - 1);
+        } else {
+            await commit("setStatus", 'pending')
+            return false
+        }
     },
-    async stopCardReader({commit, dispatch}) {
-        await commit("setReading", false);
+
+
+    /**
+     * カードリーダをポーリング
+     * @param {*} param0 
+     */
+    async execCardReader({commit, state, dispatch}) {
+        const REQUEST_COUNT = 30;
+        // LEDを点灯
+        dispatch("emissionLED", "waiting")
+
+        // REQUEST_COUNT回ポーリング
+        await commit("setStatus", 'busy')
+        const response = await dispatch("readFelica", REQUEST_COUNT)
+        console.log(response);
+        
+        if (response === true) {
+            dispatch("emissionLED", "success")
+            return response
+        } else if (response === false || response === 408) {
+            dispatch("emissionLED", "error")
+            return response
+        }
     },
+        
+
+        
+
+
     /**
      * カードリーダを起動
      */
-    async execCardReader({commit, state, dispatch}) {
+    async execCardReader2({commit, state, dispatch}) {
         dispatch("emissionLED", "waiting")
         
         const response = await this.$axios({

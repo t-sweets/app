@@ -79,7 +79,7 @@
 <script>
 import TPay from "~/components/payment/TPaySequence";
 import Cash from "~/components/payment/CashSequence";
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
@@ -90,6 +90,7 @@ export default {
   methods: {
     change(bool) {
       this.paymethod = undefined;
+      if (bool === false) this.setStatus("pending");
       this.$emit("showTotal", bool);
     },
     remove(id) {
@@ -117,6 +118,7 @@ export default {
         ? path
         : process.env.POS_HOST + "/../.." + path;
     },
+    ...mapMutations("t-pay/card-reader", ["setStatus"]),
     ...mapActions("pos/purchase", ["purchaseCheck"])
   },
   components: {

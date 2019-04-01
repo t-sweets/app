@@ -57,6 +57,7 @@
 import TPay from "~/components/charge/TPayChargeSequence";
 
 import DepositInput from "~/components/charge/DepositSequence";
+import { mapMutations } from "vuex";
 
 export default {
   data() {
@@ -69,7 +70,10 @@ export default {
   props: ["isShowTotal", "selectedMethod"],
   methods: {
     change(bool) {
-      if (!bool) this.resetData();
+      if (!bool) {
+        this.resetData();
+        this.setStatus("pending");
+      }
       this.$emit("showTotal", bool);
     },
     resetData() {
@@ -110,7 +114,9 @@ export default {
           }
         }
       });
-    }
+    },
+
+    ...mapMutations("t-pay/card-reader", ["setStatus"])
   },
   components: {
     TPay,
