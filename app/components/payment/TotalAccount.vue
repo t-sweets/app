@@ -64,11 +64,13 @@
     <transition name="sequence">
       <t-pay
         v-if="paymethod=='2ADEA824-0027-41B5-B243-10F2D24FDD4B'"
+        :items="itemsBeutiyForReceipt"
         @pushSuccess="pushSuccess"
         @reSelect="reSelect"
       ></t-pay>
       <cash
         v-if="paymethod=='F5EF99BC-0FF0-4CA4-805D-5045E12B90CF'"
+        :items="itemsBeutiyForReceipt"
         @pushSuccess="pushSuccess"
         @reSelect="reSelect"
       ></cash>
@@ -108,7 +110,7 @@ export default {
         this.paymethod = uuid;
       }
     },
-    pushSuccess() {
+    async pushSuccess() {
       this.$emit("pushSuccess");
     },
     toImageUrl(path) {
@@ -126,6 +128,18 @@ export default {
     Cash
   },
   computed: {
+    itemsBeutiyForReceipt() {
+      let items = [];
+      this.items.forEach(item => {
+        items.push({
+          name: item.name,
+          pcs: item.quantity,
+          unit: item.price,
+          price: item.quantity * item.price
+        });
+      });
+      return items;
+    },
     ...mapState("pos/payment-method", ["payment_method"])
   }
 };

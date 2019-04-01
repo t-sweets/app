@@ -36,10 +36,10 @@ export default {
     return {
       isPause: false,
       tpay_method: "felica",
-      testURL: "http://www.google.com",
-      reader_timeout: 0
+      testURL: "http://www.google.com"
     };
   },
+  props: ["items"],
   methods: {
     changeMethod() {
       if (this.tpay_method == "felica") {
@@ -124,7 +124,6 @@ export default {
                 "お使いのアカウントはこの店舗で決済を行うことができません";
               break;
           }
-          this.quitReader();
           this.isReading = false;
           this.loading.close();
           this.$ons.notification.alert(message);
@@ -139,17 +138,35 @@ export default {
           uuid: this.uuid // 決済番号
         })
       ) {
-        this.quitReader();
         this.loading.close();
-        this.$emit("pushSuccess");
+        this.prepareSuccess();
       } else {
         this.playSE("error");
         this.loading.close();
         this.$ons.notification.alert("決済エラーが発生しました");
-        this.quitReader();
       }
     },
+
+    async prepareSuccess() {
+      //レシート発行をして、pushSuccess
+      const params = {
+        total_price: parseInt(this.totalPrice),
+        payment_data: {
+          payment_method: "tpay",
+          customer_id: `**** **** **** ${this.idm.slice(-4)}`,
+          balance: this.before_payment.balance // あとで対応
+        },
+        products: this.items
+      };
+      console.log(params);
+
+      this.printReceipt(params);
+
+      this.$emit("pushSuccess");
+    },
+
     ...mapActions("pos/purchase", ["purchaseCreate"]),
+    ...mapActions("pos/receipt-printer", ["printReceipt"]),
     ...mapActions("t-pay", [
       "getApiToken",
       "getMerchantID",
@@ -158,8 +175,7 @@ export default {
     ...mapActions("t-pay/card-reader", [
       "execCardReader",
       "showMessage",
-      "emissionLED",
-      "quitReader"
+      "emissionLED"
     ]),
     ...mapMutations("t-pay/card-reader", ["setStatus"])
   },
@@ -190,7 +206,7 @@ export default {
     },
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"]),
-    ...mapState("t-pay", ["uuid"]),
+    ...mapState("t-pay", ["uuid", "before_payment"]),
     ...mapState("t-pay/card-reader", ["displayText", "idm", "isReading"])
   },
   mounted() {

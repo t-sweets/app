@@ -52,9 +52,7 @@ export default {
     return {
       isPause: false,
       qrURL: "",
-      reading: true,
-
-      reader_timeout: 0
+      reading: true
     };
   },
   methods: {

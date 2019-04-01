@@ -37,14 +37,8 @@ export const mutations = {
 }
 
 export const actions = {
-    async purchaseCheck({commit, state, rootState}) {
-        let products = [];
-        state.cart.some((product, index) => {
-            products.push({
-                "product_id": product.id,
-                "price": product.price
-            })
-        })
+    async purchaseCheck({commit, getters, rootState}) {
+        const products = getters.getPurchasesProducts
 
         const response = await this.$axios({
             method: "POST",
@@ -69,14 +63,8 @@ export const actions = {
      * 
      * @param {*} data payment method data
      */
-    async purchaseCreate({commit, state, rootState}, data) {
-        let products = [];
-        state.cart.some((product) => {
-            products.push({
-                "product_id": product.id,
-                ...product
-            })
-        })
+    async purchaseCreate({commit, getters, rootState}, data) {
+        const products = getters.getPurchasesProducts
 
         const response = await this.$axios({
             method: "POST",
@@ -97,62 +85,7 @@ export const actions = {
         })
 
         if (response.status == 201) {
-            // SlackBotへの発信
-            // let details = [];
-            // let total = 0;
-            // state.cart.forEach((product) => {
-            //     details.push({value: product.name});
-            //     details.push({value: "×"+product.quantity+" (@"+product.price+")", short:true});
-            //     details.push({value: "¥"+(product.price * product.quantity), short: true});
-            //     total += product.price * product.quantity;
-            // });    
-            // const now = await $nuxt.dateFormat(new Date, "YYYY年MM月DD日 (E) hh:mm");
-        
-            // await this.$axios({
-            //     method: "POST",
-            //     url: "https://slack.com/api/chat.postMessage",
-            //     headers: {
-            //         "Content-Type": "application/json;charset=UTF-8",
-            //         "Access-Control-Allow-Origin": "*",
-            //         "Authorization": "Bearer " + process.env.SLACK_RECEIPT_API_TOKEN
-            //     },
-            //     data: {
-            //         channel: process.env.SLACK_RECEIPT_API_CHANNEL,
-            //         username: "Sweets 決済Bot",
-            //         icon_url: '',
-            //         text: "Thank you for shoppig :tada:",
-            //         attachments: [
-            //             {
-            //                 title: process.env.SHOP_NAME,
-            //                 fields: [
-            //                     {
-            //                         value: now
-            //                     },
-            //                     {
-            //                         value: "決済UUID"
-            //                     }
-            //                 ]
-            //             },
-            //             {
-            //                 title: "---------------お買い上げ明細---------------",
-            //                 fields: [
-            //                     ...details,
-            //                     {
-            //                         title: "合計",
-            //                         short: true
-            //                     },
-            //                     {
-            //                         value: "¥"+total,
-            //                         short: true
-            //                     }
-            //                 ]
-            //             }
-            //         ],
-
-            //     }
-            // }).catch(err => {
-            //     console.error("Cant send to slack bot receipt");
-            // })
+            
             return true;
         } else return false;
     },
@@ -187,4 +120,19 @@ export const actions = {
         return product.length ? product[0].quantity : 0;
     }
 
+}
+
+export const getters = {
+    getPurchasesProducts(state) {
+        let products = [];
+        state.cart.some((product) => {
+            products.push({
+                "product_id": product.id,
+                ...product
+            })
+        })
+        console.log(products);
+        
+        return products;
+    }
 }

@@ -1,6 +1,10 @@
 export const state = () => ({
     token: null,
     uuid: null,
+    before_payment: {
+        date: null,
+        balance: 0,
+    }
 })
 
 export const mutations = {
@@ -11,7 +15,12 @@ export const mutations = {
     },
     setUUID(state, uuid) {
         state.uuid = uuid;
-    }
+    },
+
+    setBeforePayment(state, {date, balance}) {
+        state.before_payment.date = date
+        state.before_payment.balance = balance
+    },
 }
 
 export const actions = {
@@ -64,6 +73,10 @@ export const actions = {
         })
 
         if (response.status == 201) {
+            await commit("setBeforePayment", {
+                date: response.data.created_time,
+                balance: response.data.purchaser.balance
+            })
             await commit("setUUID", response.data.id)
             return true
         } else if (response.status == 400) {
