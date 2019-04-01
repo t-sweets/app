@@ -8,6 +8,9 @@
       <div class="title">おつり</div>
       <div class="change">¥{{ change }}</div>
     </div>
+    <div class="requireReceipt">
+      <el-checkbox v-model="isReceiptIssue">レシートを発行する</el-checkbox>
+    </div>
     <div class="calc-buttons">
       <div class="calc-button" v-for="num in calcButtons" :key="num">
         <el-button @click="calcButton(num)" :plain="num == 'AC' ? true : false">{{ num }}</el-button>
@@ -26,7 +29,8 @@ export default {
   data() {
     return {
       total: "0",
-      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0]
+      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0],
+      isReceiptIssue: true
     };
   },
   props: ["items"],
@@ -69,16 +73,18 @@ export default {
 
     async prepareSuccess() {
       //レシート発行をして、pushSuccess
-      const params = {
-        total_price: parseInt(this.totalPrice),
-        payment_data: {
-          payment_method: "cash",
-          cash: parseInt(this.total),
-          change: parseInt(this.change)
-        },
-        products: this.items
-      };
-      this.printReceipt(params);
+      if (this.isReceiptIssue) {
+        const params = {
+          total_price: parseInt(this.totalPrice),
+          payment_data: {
+            payment_method: "cash",
+            cash: parseInt(this.total),
+            change: parseInt(this.change)
+          },
+          products: this.items
+        };
+        this.printReceipt(params);
+      }
       this.$emit("pushSuccess");
     },
 
@@ -147,8 +153,7 @@ export default {
     }
   }
   .calc-buttons {
-    margin: 30px;
-    margin-bottom: 10px;
+    margin: 10px 20px;
     .calc-button {
       display: inline-block;
       width: 30%;
@@ -157,6 +162,10 @@ export default {
         width: 100%;
       }
     }
+  }
+  .requireReceipt {
+    text-align: right;
+    margin-right: 50px;
   }
 }
 </style>
