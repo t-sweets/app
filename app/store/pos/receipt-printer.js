@@ -46,13 +46,13 @@ export const actions = {
                 icon: "images/icon.png",
                 date: "2019年3月23日（日） 19:19",
                 total_price: 0,
-                payment_method: "テストペイ",
-                items: {
+                payment_method: "cash",
+                items: [{
                     "name": "正常に接続しています",
                     "pcs": 1,
                     "unit": 0,
                     "price": 0
-                } 
+                }]
             },  
             url: state.printer_ip + "receipt",
             timeout : 5000,
