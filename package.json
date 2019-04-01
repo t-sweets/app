@@ -1,6 +1,6 @@
 {
   "name": "sweets-front-app",
-  "version": "v1.0.3-alpha",
+  "version": "v1.0.0-beta",
   "description": "Sweets front application.",
   "author": "sho",
   "private": true,
@@ -10,8 +10,10 @@
     "dev-electron": "cross-env NODE_ENV=development electron .",
     "build": "nuxt build",
     "build:win": "nuxt build && electron-builder --win --ia32",
+    "build:win64": "nuxt build && electron-builder --win --x64",
     "build:mac": "nuxt build && electron-builder --mac",
     "compose:win": "electron-builder --win --ia32",
+    "compose:win64": "electron-builder --win --x64",
     "compose:mac": "electron-builder --mac"
   },
   "build": {
