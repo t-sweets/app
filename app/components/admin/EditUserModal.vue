@@ -216,7 +216,8 @@ export default {
       let data = {};
       if (o.name != n.name) data.name = n.name;
       if (o.email != n.email) data.email = n.email;
-      if (o.password != n.password) data.password = n.password;
+      if (o.password != n.password && (this.isSelf || this.isNew))
+        data.password = n.password;
       if (o.authority_id != n.authority_id) data.authority_id = n.authority_id;
 
       if (await this.updateUser({ id: o.id, data: data })) {
