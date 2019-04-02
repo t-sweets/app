@@ -1,10 +1,14 @@
 export const state = () => ({
     printer_ip: process.env.PRINTER_HOST,
+    receipt_data: {}
 })
 
 export const mutations = {
     set_printer_ip: (state, ip) => {
         state.printer_ip = ip
+    },
+    set_receipt_data: (state, data) => {
+        state.receipt_data = data
     }
 }
 

@@ -14,7 +14,7 @@
     >
       <div class="main">
         <p>チャージが完了しました。</p>
-        <el-button type="primary" @click="reload" round>終了</el-button>
+        <el-button type="primary" @click="forceReload" round>終了</el-button>
       </div>
     </sweet-modal>
   </v-ons-page>
@@ -22,14 +22,33 @@
 
 <script>
 export default {
-  mounted() {},
+  data() {
+    return {
+      timeout: null
+    };
+  },
   methods: {
-    reload() {
+    /**
+     * 自動で戻るためのメソッド
+     */
+    reloadTimeout() {
+      this.timeout = setTimeout(() => {
+        this.$emit("resetPosMain");
+      }, 10000);
+    },
+    /**
+     * ボタンを押した時に
+     */
+    forceReload() {
+      clearTimeout(this.timeout);
       this.$emit("resetPosMain");
     }
   },
   mounted() {
     this.$refs.modal.open();
+    const audioElem = new Audio(successSound);
+    audioElem.play();
+    this.reloadTimeout();
   }
 };
 </script>

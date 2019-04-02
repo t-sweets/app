@@ -48,7 +48,10 @@ export default {
       return this.total - this.amount >= 0 ? true : false;
     }
   },
-  props: ["amount"]
+  props: ["amount"],
+  created() {
+    this.total = this.amount;
+  }
 };
 </script>
 
