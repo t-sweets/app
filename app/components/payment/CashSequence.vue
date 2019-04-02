@@ -8,9 +8,6 @@
       <div class="title">おつり</div>
       <div class="change">¥{{ change }}</div>
     </div>
-    <div class="requireReceipt">
-      <el-checkbox v-model="isReceiptIssue">レシートを発行する</el-checkbox>
-    </div>
     <div class="calc-buttons">
       <div class="calc-button" v-for="num in calcButtons" :key="num">
         <el-button @click="calcButton(num)" :plain="num == 'AC' ? true : false">{{ num }}</el-button>
@@ -24,13 +21,12 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   data() {
     return {
       total: "0",
-      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0],
-      isReceiptIssue: true
+      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0]
     };
   },
   props: ["items"],
@@ -72,24 +68,22 @@ export default {
     },
 
     async prepareSuccess() {
-      //レシート発行をして、pushSuccess
-      if (this.isReceiptIssue) {
-        const params = {
-          total_price: parseInt(this.totalPrice),
-          payment_data: {
-            payment_method: "cash",
-            cash: parseInt(this.total),
-            change: parseInt(this.change)
-          },
-          products: this.items
-        };
-        this.printReceipt(params);
-      }
+      // レシート情報を格納
+      const params = {
+        total_price: parseInt(this.totalPrice),
+        payment_data: {
+          payment_method: "cash",
+          cash: parseInt(this.total),
+          change: parseInt(this.change)
+        },
+        products: this.items
+      };
+      this.set_receipt_data(params);
       this.$emit("pushSuccess");
     },
 
     ...mapActions("pos/purchase", ["purchaseCreate"]),
-    ...mapActions("pos/receipt-printer", ["printReceipt"])
+    ...mapMutations("pos/receipt-printer", ["set_receipt_data"])
   },
   computed: {
     method() {
@@ -114,6 +108,9 @@ export default {
     },
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"])
+  },
+  created() {
+    this.total = this.totalPrice;
   }
 };
 </script>
@@ -162,10 +159,6 @@ export default {
         width: 100%;
       }
     }
-  }
-  .requireReceipt {
-    text-align: right;
-    margin-right: 50px;
   }
 }
 </style>

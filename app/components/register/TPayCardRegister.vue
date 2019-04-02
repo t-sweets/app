@@ -35,7 +35,7 @@
             <p>{{ announceText }}</p>
             <p class="subtext">T-Payサイトでログインする事で、アカウントと紐付ける事ができます。</p>
 
-            <el-button type="primary" @click="$emit('registerDone')">完了</el-button>
+            <el-button type="primary" @click="forceReload">完了</el-button>
             <br>
             <el-button type="text" @click="reSelect">別のカードを登録する</el-button>
           </div>
@@ -52,7 +52,8 @@ export default {
     return {
       isPause: false,
       qrURL: "",
-      reading: true
+      reading: true,
+      timeout: null
     };
   },
   methods: {
@@ -102,6 +103,7 @@ export default {
         this.qrURL = `${process.env.TPAY_WEBHOST}?method=register&idm=${
           this.idm
         }`;
+        this.reloadTimeout(); // カウントダウン開始
       } else return false;
     },
     change(bool) {
@@ -112,6 +114,7 @@ export default {
       this.reading = true;
     },
     reSelect() {
+      clearTimeout(this.timeout);
       this.resetData();
       this.reading = true;
       this.qrURL = "";
@@ -121,6 +124,23 @@ export default {
       this.setStatus("pending");
       this.$emit("backMenu");
     },
+
+    /**
+     * 自動で戻るためのメソッド
+     */
+    reloadTimeout() {
+      this.timeout = setTimeout(() => {
+        this.$emit("resetPosMain");
+      }, 20000);
+    },
+    /**
+     * ボタンを押した時に
+     */
+    forceReload() {
+      clearTimeout(this.timeout);
+      this.$emit("resetPosMain");
+    },
+
     ...mapMutations("t-pay/card-reader", ["setStatus"]),
     ...mapActions("t-pay/card-reader", [
       "execCardReader",

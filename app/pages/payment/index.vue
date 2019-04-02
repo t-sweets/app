@@ -106,7 +106,13 @@ export default {
     async addCartWithReader() {
       const product = await this.getProductWithReader(this.jancode);
       this.jancode = "";
-      if (!product) return false;
+      if (!product) {
+        this.$ons.notification.alert({
+          title: "エラー",
+          message: "登録されていない商品です"
+        });
+        return false;
+      }
       this.$refs.prod.some((item, index) => {
         if (item.product.id == product.id) {
           this.$refs.prod[index].quantity += 1;

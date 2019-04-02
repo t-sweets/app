@@ -14,7 +14,15 @@
     >
       <div class="main">
         <p>購入が完了しました。</p>
-        <el-button type="primary" @click="reload" round>決済を終了する</el-button>
+        <el-button type="primary" @click="forceReload" round>決済を終了する</el-button>
+        <br>
+        <el-button
+          type="primary"
+          @click="receiptPrint"
+          :disabled="receiptBtnDisable"
+          plain
+          round
+        >レシートを印刷する</el-button>
       </div>
     </sweet-modal>
   </v-ons-page>
@@ -22,13 +30,15 @@
 
 <script>
 import successSound from "~/assets/sounds/success.mp3";
+import { mapMutations, mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      loading: undefined
+      loading: undefined,
+      receiptBtnDisable: false,
+      timeout: null
     };
   },
-  mounted() {},
   methods: {
     recognization() {
       this.loading = this.$loading({
@@ -36,14 +46,35 @@ export default {
         lock: false
       });
     },
-    reload() {
+    /**
+     * 自動で戻るためのメソッド
+     */
+    reloadTimeout() {
+      this.timeout = setTimeout(() => {
+        this.$emit("resetPosMain");
+      }, 10000);
+    },
+    /**
+     * ボタンを押した時に
+     */
+    forceReload() {
+      clearTimeout(this.timeout);
       this.$emit("resetPosMain");
-    }
+    },
+    receiptPrint() {
+      this.receiptBtnDisable = true;
+      this.printReceipt(this.receipt_data);
+    },
+    ...mapActions("pos/receipt-printer", ["printReceipt"])
+  },
+  computed: {
+    ...mapState("pos/receipt-printer", ["receipt_data"])
   },
   mounted() {
     this.$refs.modal.open();
     const audioElem = new Audio(successSound);
     audioElem.play();
+    this.reloadTimeout();
   }
 };
 </script>
