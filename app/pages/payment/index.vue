@@ -239,12 +239,12 @@ export default {
      ** 商品のリアルタイム検索
      */
     search() {
-      var products = [];
-      if (!this.search_str) return this.products.concat();
-      this.products.forEach(product => {
-        if (product.name.indexOf(this.search_str) != -1) products.push(product);
-      });
-      return products;
+      if (!this.search_str)
+        return this.products.filter(product => product.display);
+      return this.products.filter(
+        product =>
+          product.name.indexOf(this.search_str) != -1 && product.display
+      );
     },
     /*
      ** 小計タブを表示するかどうか
