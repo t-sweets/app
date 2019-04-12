@@ -43,12 +43,8 @@
         </el-footer>
       </el-container>
     </sweet-modal>
-    <sweet-modal
-      overlay-theme="dark"
-      icon="error"
-      ref="errorModal"
-      title="Login Error..."
-    >ログインに失敗しました
+    <sweet-modal overlay-theme="dark" icon="error" ref="errorModal" title="Login Error...">
+      ログインに失敗しました
       <sweet-button slot="button">
         <el-button type="primary" @click="$refs.errorModal.close(),$refs.modal.open()">再試行</el-button>
         <el-button @click="$refs.errorModal.close()">Done</el-button>

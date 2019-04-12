@@ -45,10 +45,12 @@
             </el-row>
           </el-col>
           <el-col :span="4">
-            <el-button class="tab-button" type="primary" @click="showTotal(true)" round>Purchase</el-button>
+            <el-button class="tab-button" type="primary" @click="showTotal(true)" round>
+              <b>お会計</b>
+            </el-button>
           </el-col>
           <el-col :span="4">
-            <el-button class="tab-button" type="info" @click="resetCart()" round>Reset</el-button>
+            <el-button class="tab-button" type="info" @click="resetCart()" round>リセット</el-button>
           </el-col>
         </el-row>
       </div>
@@ -293,14 +295,21 @@ export default {
     ...mapState("pos", ["products"]),
     ...mapState("pos/purchase", ["cart"])
   },
-  mounted() {
+  async mounted() {
     const transactionUUID = uuidv4();
     this.setUUID(transactionUUID);
-
-    /**
-     * バーコードリーダをオン
-     */
-    this.enableCodeReader(true);
+    if (await this.getProducts()) {
+      /**
+       * バーコードリーダをオン
+       */
+      this.enableCodeReader(true);
+    } else {
+      this.$notify({
+        title: "エラー",
+        message: "商品情報の取得ができませんでした。",
+        type: "error"
+      });
+    }
   }
 };
 </script>

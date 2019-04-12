@@ -39,7 +39,7 @@ export default {
     color: #999;
   }
   &.big {
-    min-height: 38vh;
+    min-height: 40vh;
     .title {
       padding-top: 90px;
     }

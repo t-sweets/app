@@ -12,6 +12,27 @@
 
     <el-card class="box-card">
       <div slot="header" class="clearfix">
+        <p style="float: left">T-Pay Server</p>
+        <el-button style="float: right" type="primary" @click="connect_tpay_server">Connect</el-button>
+      </div>
+      <el-form ref="form" :model="extraConfig.tpay" label-width="150px">
+        <el-form-item label="Account Name">
+          <el-input v-model="extraConfig.tpay.name"></el-input>
+        </el-form-item>
+        <el-form-item label="Account Password">
+          <el-input v-model="extraConfig.tpay.password" type="password"></el-input>
+        </el-form-item>
+        <el-form-item label="Merchant ID">
+          <el-input v-model="extraConfig.tpay.merchant_id"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="setTPayAccount">Save</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <el-card class="box-card">
+      <div slot="header" class="clearfix">
         <p style="float: left">T-Pay Card Reader</p>
         <el-button style="float: right" type="primary" @click="connect_reader">Connect</el-button>
       </div>
@@ -51,6 +72,11 @@ export default {
   data() {
     return {
       extraConfig: {
+        tpay: {
+          name: "",
+          password: "",
+          merchant_Id: ""
+        },
         reader_ip: "",
         printer_ip: ""
       }
@@ -69,6 +95,31 @@ export default {
       this.extraConfig.reader_ip = process.env.IDM_READER_HOST;
       this.setReaderIp();
     },
+    async setTPayAccount() {
+      await this.setAccount(this.extraConfig.tpay);
+      this.$notify({
+        title: "TPay Account Saved",
+        message: "T-Pay account has been saved",
+        type: "success"
+      });
+    },
+
+    async connect_tpay_server() {
+      if (await this.getApiToken()) {
+        this.$notify({
+          title: "Success",
+          message: "T-Pay Server is Connection Success",
+          type: "success"
+        });
+      } else {
+        this.$notify({
+          title: "Error",
+          message: "Connection refused",
+          type: "error"
+        });
+      }
+    },
+
     async connect_reader() {
       if (await this.showMessage()) {
         this.$notify({
@@ -113,8 +164,10 @@ export default {
       }
     },
 
+    ...mapMutations("t-pay", ["setAccount"]),
     ...mapMutations("t-pay/card-reader", ["setIp"]),
     ...mapMutations("pos/receipt-printer", ["set_printer_ip"]),
+    ...mapActions("t-pay", ["getApiToken"]),
     ...mapActions("pos/payment-method", ["getPaymentMethod"]),
     ...mapActions("t-pay/card-reader", ["showMessage"]),
     ...mapActions("pos/receipt-printer", ["testPrint"])
@@ -123,12 +176,16 @@ export default {
     ...mapState("pos", ["authority_index"]),
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/admin", ["user"]),
+    ...mapState("t-pay", ["account"]),
     ...mapState("t-pay/card-reader", ["reader_ip"]),
     ...mapState("pos/receipt-printer", ["printer_ip"])
   },
   created() {
     this.extraConfig.reader_ip = this.reader_ip;
     this.extraConfig.printer_ip = this.printer_ip;
+    this.extraConfig.tpay = {
+      ...this.account
+    };
   }
 };
 </script>

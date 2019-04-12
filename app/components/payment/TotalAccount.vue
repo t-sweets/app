@@ -12,7 +12,7 @@
           @click="change(false)"
           modifier="quiet"
           style="margin: 6px 0"
-        >Cancel</v-ons-button>
+        >キャンセル</v-ons-button>
       </el-col>
       <el-col class="nav-title" :span="16">
         <span>お会計</span>
@@ -56,6 +56,7 @@
               round
               @click="selectPaymentMethod(method.uuid)"
               icon="el-icon-message"
+              :disabled="method.uuid == '2ADEA824-0027-41B5-B243-10F2D24FDD4B' ? !isServiceable : false"
             >{{ method.name }}</el-button>
           </el-col>
         </el-row>
@@ -81,7 +82,7 @@
 <script>
 import TPay from "~/components/payment/TPaySequence";
 import Cash from "~/components/payment/CashSequence";
-import { mapState, mapActions, mapMutations } from "vuex";
+import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -140,7 +141,8 @@ export default {
       });
       return items;
     },
-    ...mapState("pos/payment-method", ["payment_method"])
+    ...mapState("pos/payment-method", ["payment_method"]),
+    ...mapGetters("t-pay", ["isServiceable"])
   }
 };
 </script>

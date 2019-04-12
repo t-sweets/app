@@ -57,7 +57,7 @@
 import TPay from "~/components/charge/TPayChargeSequence";
 
 import DepositInput from "~/components/charge/DepositSequence";
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters } from "vuex";
 
 export default {
   data() {
@@ -143,12 +143,20 @@ export default {
     },
     confirmText() {
       return "¥" + this.price + "をチャージしますか？";
-    }
+    },
+    ...mapGetters("t-pay", ["isServiceable"])
   },
   async mounted() {
     switch (this.uuid) {
       case "2ADEA824-0027-41B5-B243-10F2D24FDD4B":
-        await this.$refs.tpay_sequense.prepareCharge();
+        if (this.isServiceable) {
+          await this.$refs.tpay_sequense.prepareCharge();
+        } else {
+          this.change(false);
+          this.$alert("管理者へ問い合わせください。", "エラー(401)", {
+            confirmButtonText: "OK"
+          });
+        }
         break;
     }
   }

@@ -18,6 +18,7 @@
 
 <script>
 import registerModal from "~/components/register/TPayCardRegister";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -39,8 +40,20 @@ export default {
     }
   },
   components: { registerModal },
+  computed: {
+    ...mapGetters("t-pay", ["isServiceable"])
+  },
   mounted() {
-    this.openModal(true);
+    if (this.isServiceable) {
+      this.openModal(true);
+    } else {
+      this.$alert("管理者へ問い合わせください。", "エラー(401)", {
+        confirmButtonText: "OK",
+        callback: action => {
+          this.$emit("pop-page");
+        }
+      });
+    }
   }
 };
 </script>
