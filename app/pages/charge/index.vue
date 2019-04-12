@@ -31,7 +31,7 @@ import DonePage from "~/pages/charge/done";
 import ChargeDialog from "~/components/charge/ChargeDialog";
 import PaymentButton from "~/components/charge/PaymentButton";
 
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
   data() {
@@ -69,7 +69,8 @@ export default {
       });
       return methods;
     },
-    ...mapState("pos/payment-method", ["payment_method"])
+    ...mapState("pos/payment-method", ["payment_method"]),
+    ...mapGetters("t-pay", ["isServiceable"])
   },
   async created() {}
 };

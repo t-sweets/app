@@ -68,6 +68,7 @@ export default {
       } else if (response === false) {
         this.playSE("error");
         this.$ons.notification.alert("不明なエラーが発生しました。");
+        this.reSelect();
       } else if (response === 408) {
         this.playSE("error");
         this.isPause = true;

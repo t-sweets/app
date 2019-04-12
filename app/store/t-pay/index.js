@@ -1,10 +1,17 @@
 export const state = () => ({
     token: null,
     uuid: null,
+    
+    account: {
+        name: process.env.TPAY_ACCOUNT_NAME,
+        password: process.env.TPAY_ACCOUNT_PASSWORD,
+        merchant_id: process.env.MERCHANT_ID,
+    },
+    
     before_payment: {
         date: null,
         balance: 0,
-    }
+    },
 })
 
 export const mutations = {
@@ -17,6 +24,12 @@ export const mutations = {
         state.uuid = uuid;
     },
 
+    setAccount(state, data) {
+        state.account = {
+            ...data
+        } 
+    },
+
     setBeforePayment(state, {date, balance}) {
         state.before_payment.date = date
         state.before_payment.balance = balance
@@ -25,7 +38,7 @@ export const mutations = {
 
 export const actions = {
 
-    async getApiToken({commit}) {
+    async getApiToken({state, commit}) {
         const response = await this.$axios({
             method: "POST",
             headers: {
@@ -34,8 +47,8 @@ export const actions = {
             },
             url: process.env.TPAY_HOST + "/accounts/login/",
             data: {
-                username: process.env.TPAY_ACCOUNT_NAME,
-                password: process.env.TPAY_ACCOUNT_PASSWORD
+                username: state.account.name,
+                password: state.account.password
             },
             timeout : 5000,
         }).catch(err => {
@@ -60,7 +73,7 @@ export const actions = {
             },
             url: process.env.TPAY_HOST + "/checkouts/",
             data: {
-                merchant_id: process.env.MERCHANT_ID,
+                merchant_id: state.account.merchant_id,
                 payment_method: 1,
                 amount: amount,
                 idm: idm,
@@ -96,7 +109,7 @@ export const actions = {
             },
             url: process.env.TPAY_HOST + "/deposits/",
             data: {
-                merchant_id: process.env.MERCHANT_ID,
+                merchant_id: state.account.merchant_id,
                 amount: amount,
                 idm: idm,
             },
@@ -115,3 +128,9 @@ export const actions = {
         } else return false;
     }
 }
+
+export const getters = {
+    isServiceable(state) {
+        return state.account.name && state.account.password && state.account.merchant_id
+    } 
+};

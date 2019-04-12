@@ -4,87 +4,17 @@ export const state = () => ({
         "client": null,
         "uid": null
     },
+
+    config: {
+        "shop_name": process.env.SHOP_NAME,  // 販売店の名前
+        "terminal_id": process.env.TERMINAL_ID,  // POS端末のID（任意識別番号）
+        "account_email": process.env.POS_AUTH_EMAIL, // POSAPIアクセス用アカウントID
+        "account_password": process.env.POS_AUTH_PASSWORD, // POSAPIアクセス用アカウントPass
+    },
+
     products: [],
 
     authority_index: {},
-
-
-    products1: [
-        {
-            id: 1,
-            name: "カップ麺",
-            image_path: require("~/assets/images/Product001.png"),
-            price: 130
-        },
-        {
-            id: 2,
-            name: "ペットボトル飲料",
-            image_path: require("~/assets/images/Product002.png"),
-            price: 100
-        },
-        {
-            id: 3,
-            name: "缶ジュース",
-            image_path: require("~/assets/images/Product003.png"),
-            price: 50
-        },
-        {
-            id: 4,
-            name: "アイス",
-            image_path: require("~/assets/images/Product004.png"),
-            price: 100
-        },
-        {
-            id: 5,
-            name: "焼きおにぎり",
-            image_path: require("~/assets/images/Product005.png"),
-            price: 30
-        },
-        {
-            id: 6,
-            name: "チャーハン1/2",
-            image_path: require("~/assets/images/Product006.png"),
-            price: 200
-        },
-
-        {
-            id: 7,
-            name: "ゼリー",
-            image_path: require("~/assets/images/Product007.png"),
-            price: 30
-        },
-        {
-            id: 8,
-            name: "今川焼き",
-            image_path: require("~/assets/images/Product008.png"),
-            price: 60
-        },
-        {
-            id: 9,
-            name: "ポッキー・プリッツ小袋",
-            image_path: require("~/assets/images/Product009.png"),
-            price: 30
-        },
-        {
-            id: 10,
-            name: "スナック・チョコレート",
-            image_path: require("~/assets/images/Product010.png"),
-            price: 100
-        },
-        {
-            id: 11,
-            name: "柿の種・おかき",
-            image_path: require("~/assets/images/Product011.png"),
-            price: 50
-        },
-        {
-            id: 12,
-            name: "ラムネ菓子",
-            image_path: require("~/assets/images/Product012.png"),
-            price: 70
-        }
-    ],
-
 });
 
 export const mutations = {
@@ -112,14 +42,22 @@ export const mutations = {
         })
         products.unshift(product);
         state.products = products;
+    },
+
+    setConfig(state, {shop_name, terminal_id, account_email, account_password}) {
+        state.config.shop_name = shop_name;
+        state.config.terminal_id = terminal_id;
+        state.config.account_email = account_email;
+        state.config.account_password = account_password;
     }
 }
 
 export const actions = {
+
     /**
      * POS起動時に実行. 
      */
-    async initialize({ commit }) {
+    async initialize({state, commit }) {
         const response = await this.$axios({
             method: "POST",
             headers: {
@@ -127,8 +65,8 @@ export const actions = {
                 "Access-Control-Allow-Origin": "*"
             },
             data: {
-                email: process.env.POS_AUTH_EMAIL,
-                password: process.env.POS_AUTH_PASSWORD
+                email: state.config.account_email,
+                password: state.config.account_password
             },
             url: process.env.POS_HOST + "/auth/sign_in"
         })
