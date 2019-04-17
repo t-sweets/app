@@ -22,21 +22,22 @@
       :hide-close-button="true"
     >
       <el-form
-        ref="form"
+        ref="account_register_form"
         :model="account_register_form"
         label-width="120px"
         @submit.native.prevent="registerPOSConfig"
+        :rules="account_register_rule"
       >
-        <el-form-item label="POS Name">
+        <el-form-item label="Shop Name" prop="shop_name">
           <el-input v-model="account_register_form.shop_name" placeholder="Sweets n号店"></el-input>
         </el-form-item>
-        <el-form-item label="Terminal ID">
+        <el-form-item label="Terminal ID" prop="terminal_id">
           <el-input v-model="account_register_form.terminal_id" placeholder="POS0001"></el-input>
         </el-form-item>
-        <el-form-item label="Account">
+        <el-form-item label="Account" prop="account_email">
           <el-input v-model="account_register_form.account_email" placeholder="pos@example.com"></el-input>
         </el-form-item>
-        <el-form-item label="Password">
+        <el-form-item label="Password" prop="account_password">
           <el-input v-model="account_register_form.account_password" type="password"></el-input>
         </el-form-item>
         <el-form-item style="float:right">
@@ -61,6 +62,36 @@ export default {
         terminal_id: "",
         account_email: "",
         account_password: ""
+      },
+      account_register_rule: {
+        shop_name: [
+          {
+            required: true,
+            message: "店舗名を入力してください",
+            trigger: "blur"
+          }
+        ],
+        terminal_id: [
+          {
+            required: true,
+            message: "端末IDを入力してください",
+            trigger: "blur"
+          }
+        ],
+        account_email: [
+          {
+            required: true,
+            message: "認証POSアカウントのemailを入力してください",
+            trigger: "blur"
+          }
+        ],
+        account_password: [
+          {
+            required: true,
+            message: "POSアカウントのパスワードを入力してください",
+            trigger: "blur"
+          }
+        ]
       }
     };
   },
@@ -69,6 +100,9 @@ export default {
       this.$emit("push-page", pos);
     },
 
+    /**
+     * アカウント登録用モーダルを表示
+     */
     openPOSConfig() {
       this.account_register_form = {
         ...this.config
@@ -76,15 +110,20 @@ export default {
       this.$refs.POSAccountInit.open();
     },
 
+    /**
+     *
+     */
     async registerPOSConfig() {
-      await this.setConfig(this.account_register_form);
-      this.$refs.POSAccountInit.close();
-      this.init();
+      await this.$refs.account_register_form.validate(async valid => {
+        if (valid) {
+          await this.setConfig(this.account_register_form);
+          this.$refs.POSAccountInit.close();
+          this.init();
+        }
+      });
     },
 
     async init() {
-      console.log(this.config);
-
       // POSアカウントが登録されているか確認
       if (!this.config.account_email || !this.config.account_password) {
         this.openPOSConfig();
