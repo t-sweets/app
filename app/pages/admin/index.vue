@@ -28,6 +28,7 @@
     </el-row>
 
     <edit-user-modal :isSelf="true" ref="myDataEdit" @logout="execLogout()"/>
+    <liquidation ref="inspectMenuModal"/>
   </v-ons-page>
 </template>
 
@@ -42,6 +43,7 @@ import arrival_process from "~/pages/admin/arrival_process";
 import sales_manager from "~/pages/admin/sales_manager";
 import users_manager from "~/pages/admin/users_manager";
 import confirm_connection from "~/pages/admin/confirm_connection";
+import liquidation from "~/pages/admin/liquidation/";
 
 import { mapState, mapActions } from "vuex";
 
@@ -64,10 +66,13 @@ export default {
           authority: ["admin", "inventoryer", "arriver"]
         },
         {
-          title: "点検・生産",
+          title: "点検・清算",
           description: "入出金、レジチェックなど",
           icon: ["fas", "money-check-alt"],
-          authority: ["admin"]
+          click: () => {
+            this.$refs.inspectMenuModal.openModal();
+          },
+          authority: ["admin", "inventoryer"]
         },
         {
           title: "売上",
@@ -104,7 +109,8 @@ export default {
   },
   components: {
     MenuButton,
-    EditUserModal
+    EditUserModal,
+    liquidation
   },
   methods: {
     editModal() {

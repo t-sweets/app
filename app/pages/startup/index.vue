@@ -34,7 +34,7 @@
         <el-form-item label="Terminal ID" prop="terminal_id">
           <el-input v-model="account_register_form.terminal_id" placeholder="POS0001"></el-input>
         </el-form-item>
-        <el-form-item label="Account" prop="account_email">
+        <el-form-item label="Account Email" prop="account_email">
           <el-input v-model="account_register_form.account_email" placeholder="pos@example.com"></el-input>
         </el-form-item>
         <el-form-item label="Password" prop="account_password">
@@ -50,6 +50,7 @@
 
 <script>
 import pos from "~/pages/payment/";
+
 import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 
 export default {
