@@ -63,4 +63,28 @@ export const actions = {
       return false
     }
   },
+  /**
+   * レジ内残高照会
+   */
+  async balance({rootState}) {
+    const response = await this.$axios({
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+        ...rootState.pos.admin.auth
+      },
+      url: process.env.POS_HOST + "/registers/balances",
+      timeout: 3000
+    })
+      .catch(err => {
+        return err.response
+      });
+
+    if (response && response.status == 200) {
+      return response.data
+    } else {
+      return false
+    }
+  }
 }
