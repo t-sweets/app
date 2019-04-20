@@ -63,5 +63,12 @@ ons-page {
 .dialog-container {
   -webkit-mask-image: none !important;
 }
-</style>
 
+.el-message-box__wrapper {
+  z-index: 20010 !important;
+}
+
+.v-modal {
+  z-index: 20005 !important;
+}
+</style>

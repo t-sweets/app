@@ -17,10 +17,10 @@
       type="textarea"
       :rows="10"
       placeholder="メモ"
-      v-model="deposit.memo"
+      v-model="deposit.detail"
     ></el-input>
     <div class="footer">
-      <el-button type="primary" :disabled="deposit.price <= 0">入金する</el-button>
+      <el-button type="primary" :disabled="deposit.price <= 0" @click="confirmDeposit">入金する</el-button>
     </div>
     <calc-popover :popover="popover" :total="deposit.price" @confirm="inputPrice"/>
   </v-ons-page>
@@ -28,7 +28,7 @@
 
 <script>
 import CalcPopover from "@/components/CalcPopover";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -40,11 +40,37 @@ export default {
       },
       deposit: {
         price: 0,
-        memo: ""
+        detail: ""
       }
     };
   },
   methods: {
+    confirmDeposit() {
+      this.$confirm(
+        `レジ庫内の残高 ¥${this.deposit.price} を出金しますか？`,
+        "確認",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+          zIndex: 9999
+        }
+      ).then(async () => {
+        const response = await this.execDeposit({
+          amount: this.deposit.price,
+          detail: this.deposit.detail
+        });
+        if (response != false) {
+          this.pop_page();
+          this.$notify({
+            title: "Deposit Success",
+            message: "入金が完了しました",
+            type: "success",
+            zIndex: 20020
+          });
+        }
+      });
+    },
     showPopover(event, direction, coverTarget = false) {
       this.popover.target = event;
       this.popover.direction = direction;
@@ -54,11 +80,13 @@ export default {
     inputPrice(num) {
       this.deposit.price = num;
       this.popover.visible = false;
-    }
+    },
+    ...mapActions("pos/admin/liquidation-manager", { execDeposit: "deposit" })
   },
   computed: {
     ...mapState("pos/admin", ["user"])
   },
+  props: ["pop_page"],
   components: { CalcPopover }
 };
 </script>
@@ -77,3 +105,5 @@ export default {
   }
 }
 </style>
+
+

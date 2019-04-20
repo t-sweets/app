@@ -17,7 +17,7 @@
       type="textarea"
       :rows="10"
       placeholder="メモ"
-      v-model="withdraw.memo"
+      v-model="withdraw.detail"
     ></el-input>
     <div class="footer">
       <el-button type="primary" :disabled="withdraw.price <= 0" @click="confirmWithdraw">出金する</el-button>
@@ -40,7 +40,7 @@ export default {
       },
       withdraw: {
         price: 0,
-        memo: ""
+        detail: ""
       }
     };
   },
@@ -53,12 +53,22 @@ export default {
           confirmButtonText: "OK",
           cancelButtonText: "Cancel",
           type: "warning",
-          customClass: "over-modal-confirm"
+          zIndex: 9999
         }
-      ).then(() => {
-        const response = this.execWithdraw({
-          amount: ""
+      ).then(async () => {
+        const response = await this.execWithdraw({
+          amount: this.withdraw.price,
+          detail: this.withdraw.detail
         });
+        if (response != false) {
+          this.pop_page();
+          this.$notify({
+            title: "Withdraw Success",
+            message: "出金が完了しました",
+            type: "success",
+            zIndex: 20020
+          });
+        }
       });
     },
     showPopover(event, direction, coverTarget = false) {
@@ -76,6 +86,7 @@ export default {
   computed: {
     ...mapState("pos/admin", ["user"])
   },
+  props: ["pop_page"],
   components: { CalcPopover }
 };
 </script>
@@ -95,8 +106,4 @@ export default {
 }
 </style>
 
-<style lang="scss">
-.over-modal-confirm {
-  z-index: 40010 !important;
-}
-</style>
+

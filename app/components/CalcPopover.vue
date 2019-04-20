@@ -40,11 +40,11 @@ export default {
   methods: {
     calcButton(obj) {
       if (typeof obj === "number") {
-        this.totalPrice != "0"
-          ? (this.totalPrice += obj)
-          : (this.totalPrice = obj.toString());
+        this.totalPrice != 0
+          ? (this.totalPrice = parseInt(this.totalPrice + obj.toString()))
+          : (this.totalPrice = obj);
       } else if (obj == "AC") {
-        this.totalPrice = "0";
+        this.totalPrice = 0;
       } else if (obj == "OK") {
         this.$emit("confirm", this.totalPrice);
       }

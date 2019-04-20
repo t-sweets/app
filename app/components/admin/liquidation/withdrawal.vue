@@ -28,11 +28,21 @@ export default {
       tabs: [
         {
           page: deposit,
-          key: "dailySales"
+          key: "dailySales",
+          props: {
+            pop_page: () => {
+              this.$emit("dialog-pop-page");
+            }
+          }
         },
         {
           page: withdraw,
-          key: "dailySales2"
+          key: "dailySales2",
+          props: {
+            pop_page: () => {
+              this.$emit("dialog-pop-page");
+            }
+          }
         }
       ]
     };
