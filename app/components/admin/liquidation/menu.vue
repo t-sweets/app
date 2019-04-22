@@ -32,7 +32,10 @@ export default {
         },
         {
           title: "レジチェック",
-          onClick: () => {}
+          onClick: () => {
+            this.$emit("dialog-hide");
+            this.$emit("push-base-page", registerCheck);
+          }
         },
         {
           title: "レジチェック履歴",

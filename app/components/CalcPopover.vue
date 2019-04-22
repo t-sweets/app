@@ -6,10 +6,11 @@
     :target="popover.target"
     :direction="popover.direction"
     :cover-target="popover.coverTarget"
+    @preshow="preShow"
   >
     <div class="calc-pop">
       <div class="content">
-        <div class="result-display">{{ `¥${totalPrice}` }}</div>
+        <div class="result-display">{{ calcResult }}</div>
         <div class="calc-buttons">
           <div
             class="calc-button"
@@ -36,8 +37,11 @@ export default {
       totalPrice: 0
     };
   },
-  props: ["popover", "total"],
+  props: ["popover", "total", "prefix"],
   methods: {
+    preShow() {
+      this.totalPrice = this.total;
+    },
     calcButton(obj) {
       if (typeof obj === "number") {
         this.totalPrice != 0
@@ -48,6 +52,11 @@ export default {
       } else if (obj == "OK") {
         this.$emit("confirm", this.totalPrice);
       }
+    }
+  },
+  computed: {
+    calcResult() {
+      return `${this.prefix ? this.prefix : ""}${this.totalPrice}`;
     }
   }
 };

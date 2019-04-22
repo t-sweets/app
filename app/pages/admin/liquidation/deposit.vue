@@ -22,7 +22,7 @@
     <div class="footer">
       <el-button type="primary" :disabled="deposit.price <= 0" @click="confirmDeposit">入金する</el-button>
     </div>
-    <calc-popover :popover="popover" :total="deposit.price" @confirm="inputPrice"/>
+    <calc-popover :popover="popover" prefix="¥" :total="deposit.price" @confirm="inputPrice"/>
   </v-ons-page>
 </template>
 
@@ -56,7 +56,7 @@ export default {
           zIndex: 9999
         }
       ).then(async () => {
-        const response = await this.execDeposit({
+        const response = await this.setDeposit({
           amount: this.deposit.price,
           detail: this.deposit.detail
         });
@@ -81,7 +81,7 @@ export default {
       this.deposit.price = num;
       this.popover.visible = false;
     },
-    ...mapActions("pos/admin/liquidation-manager", { execDeposit: "deposit" })
+    ...mapActions("pos/admin/liquidation-manager", ["setDeposit"])
   },
   computed: {
     ...mapState("pos/admin", ["user"])
