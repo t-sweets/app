@@ -1,5 +1,5 @@
 <template>
-  <v-ons-dialog class="total-dialog" cancelable :visible="isShowTotal" @posthide="change(false)">
+  <v-ons-dialog class="charge-dialog" cancelable :visible="isShowTotal" @posthide="change(false)">
     <el-row class="nav">
       <el-col :span="4">
         <v-ons-button
@@ -164,7 +164,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.total-dialog {
+.charge-dialog {
   .nav {
     border-bottom: solid 0.5px #999;
     .nav-title {
@@ -271,6 +271,23 @@ export default {
 
 
 <style lang="scss">
+.charge-dialog {
+  .dialog {
+    width: 80%;
+    // bottom: 0;
+    // top: auto;
+    // transform: translate(-50%, 0);
+    ons-button.cancel-button {
+      color: #555;
+      cursor: pointer;
+    }
+  }
+  @media screen and (min-width: 1024px) {
+    .dialog {
+      width: 45%;
+    }
+  }
+}
 .charge-price {
   .el-input-number {
     .el-input {

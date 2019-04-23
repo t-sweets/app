@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     start() {
-      this.$emit("push-page", pos);
+      this.$emit("resetPosMain");
     },
 
     /**

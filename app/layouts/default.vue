@@ -10,6 +10,7 @@
 
 <script>
 import start from "~/pages/startup/";
+import menu from "@/pages/menu/";
 import index from "~/pages/payment/";
 export default {
   // middleware: ["authenticated"],
@@ -21,10 +22,10 @@ export default {
   methods: {
     popPage(event) {
       if (event) this.pageStack.splice(this.pageStack.length - 1, 0, event);
-      this.pageStack.splice(this.pageStack.length - 1, 1);
+      this.pageStack.splice(this.pageStack.length - 2, 2);
     },
     resetPosMain() {
-      this.pageStack = [start, index];
+      this.pageStack = [start, menu, index];
     }
   }
 };
