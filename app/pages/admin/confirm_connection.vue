@@ -20,7 +20,7 @@
           <el-input v-model="extraConfig.tpay.name"></el-input>
         </el-form-item>
         <el-form-item label="Account Password">
-          <el-input v-model="extraConfig.tpay.password" type="password"></el-input>
+          <el-input v-model="extraConfig.tpay.password" show-password></el-input>
         </el-form-item>
         <el-form-item label="Merchant ID">
           <el-input v-model="extraConfig.tpay.merchant_id"></el-input>
