@@ -75,7 +75,7 @@
       icon="success"
     >
       レジチェックを完了しました
-      <sweet-button slot="button" @click="$refs['hide-close-button blocking'].hide()">完了</sweet-button>
+      <sweet-button slot="button" @click="reload">完了</sweet-button>
     </sweet-modal>
   </v-ons-page>
 </template>
@@ -174,6 +174,7 @@ export default {
     },
     reload() {
       this.actualForm = this.initActualForm();
+      this.$refs["register-check-success-modal"].close();
     },
 
     ...mapActions("pos/admin/liquidation-manager", [
