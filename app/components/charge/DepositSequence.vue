@@ -49,15 +49,6 @@ export default {
     reSelect() {
       this.$emit("reSelect");
     },
-    calcButton(obj) {
-      if (typeof obj === "number") {
-        this.total != "0" ? (this.total += obj) : (this.total = obj.toString());
-      } else if (obj == "AC") {
-        this.total = "0";
-      } else if (obj == "OK") {
-        this.$emit("exec-charge");
-      }
-    },
     showPopover(event, direction, coverTarget = false) {
       this.popover.target = event;
       this.popover.coverTarget = coverTarget;

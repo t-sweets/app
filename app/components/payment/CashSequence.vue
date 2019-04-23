@@ -1,52 +1,69 @@
 <template>
-  <div class="calc">
-    <div class="title">
-      <div class="title">入金額</div>
-      <div class="total">{{ total }}</div>
-    </div>
-    <div class="change">
-      <div class="title">おつり</div>
-      <div class="change">¥{{ change }}</div>
-    </div>
-    <div class="calc-buttons">
-      <div class="calc-button" v-for="num in calcButtons" :key="num">
-        <el-button @click="calcButton(num)" :plain="num == 'AC' ? true : false">{{ num }}</el-button>
+  <div class="base">
+    <div class="calc">
+      <v-ons-list modifier="inset">
+        <v-ons-list-item tappable>
+          <div class="left">入金額</div>
+          <div class="center">
+            <el-input size="large" v-model="total" @focus="showPopover($event)">
+              <template slot="prepend">¥</template>
+            </el-input>
+          </div>
+        </v-ons-list-item>
+        <v-ons-list-item>
+          <div class="center">釣り銭</div>
+          <div class="right">{{ `¥${change}` }}</div>
+        </v-ons-list-item>
+      </v-ons-list>
+      <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
+      <div class="payment-btns">
+        <el-button
+          type="primary"
+          round
+          :disabled="!paymentable"
+          icon="el-icon-message"
+          @click="settlement"
+        >支払う</el-button>
       </div>
-      <div class="calc-button">
-        <el-button type="primary" @click="calcButton('OK')" :disabled="!paymentable">完了</el-button>
-      </div>
     </div>
-    <el-button @click="reSelect" type="text">別の支払方法を選択する</el-button>
+    <calc-popover :popover="popover" prefix="¥" :total="total" @confirm="inputPrice"/>
   </div>
 </template>
 
 <script>
+import CalcPopover from "@/components/CalcPopover";
 import { mapState, mapActions, mapMutations } from "vuex";
+
 export default {
   data() {
     return {
-      total: "0",
-      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0]
+      total: 0,
+      popover: {
+        visible: false,
+        target: null,
+        direction: "down",
+        coverTarget: false
+      }
     };
   },
-  props: ["items"],
   methods: {
     reSelect() {
       this.$emit("reSelect");
     },
-    calcButton(obj) {
-      if (typeof obj === "number") {
-        this.total != "0" ? (this.total += obj) : (this.total = obj.toString());
-      } else if (obj == "AC") {
-        this.total = "0";
-      } else if (obj == "OK") {
-        this.recognization();
-      }
+    showPopover(event, direction, coverTarget = false) {
+      this.popover.target = event;
+      this.popover.coverTarget = coverTarget;
+      this.popover.visible = true;
     },
-    /*
-     ** 決済テスト用
+    inputPrice(num) {
+      this.total = num;
+      this.popover.visible = false;
+    },
+
+    /**
+     * 決済処理を実行
      */
-    async recognization() {
+    async settlement() {
       this.isPause = true;
       this.loading = this.$loading({
         text: "Loading",
@@ -67,6 +84,9 @@ export default {
       }
     },
 
+    /**
+     * 決済完了画面へ遷移する前処理
+     */
     async prepareSuccess() {
       // レシート情報を格納
       const params = {
@@ -109,6 +129,8 @@ export default {
     ...mapState("pos/payment-method", ["payment_method"]),
     ...mapState("pos/purchase", ["cart"])
   },
+  props: ["items"],
+  components: { CalcPopover },
   created() {
     this.total = this.totalPrice;
   }
@@ -117,46 +139,51 @@ export default {
 
 
 <style lang="scss" scoped>
-.calc {
-  @include pc {
-    width: 100%;
-  }
-  @include tab {
-    height: 80%;
-  }
-  display: inline-block;
+.base {
+  margin: 0 auto;
   text-align: center;
-  margin-bottom: 20px;
-  .title,
-  .change {
-    margin: auto 0;
-    padding: 5px 30px;
-    .title {
-      display: inline-block;
+  .calc {
+    @include pc {
+      width: 100%;
     }
-    .total {
-      display: inline-block;
-      width: 400px;
-      padding: 0px 10px;
-      background-color: rgb(206, 255, 239);
-      border: 1px solid rgb(38, 167, 253);
-      font-size: 35px;
-      text-align: right;
+    @include tab {
+      height: 100%;
     }
-    .change {
-      display: inline-block;
-      text-align: right;
-      width: 400px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
+    .list {
+      width: 100%;
     }
-  }
-  .calc-buttons {
-    margin: 10px 20px;
-    .calc-button {
-      display: inline-block;
-      width: 30%;
-      margin: 5px;
+    .el-input {
+      font-size: 25px;
+    }
+    button {
+      &.el-button--text {
+        font-size: 16px;
+      }
+    }
+    .payment-btns {
+      width: 80%;
+      margin: 10px auto;
       button {
         width: 100%;
+        font-size: 20px;
+        padding: 20px;
+        border-radius: 100px;
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.base {
+  .calc {
+    .el-input {
+      text-align: right;
+      margin: 10px auto;
+      .el-input__inner {
+        height: 55px;
       }
     }
   }
