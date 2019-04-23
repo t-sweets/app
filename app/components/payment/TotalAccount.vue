@@ -68,6 +68,7 @@
         :items="itemsBeutiyForReceipt"
         @pushSuccess="pushSuccess"
         @reSelect="reSelect"
+        @transitionCharge="$emit('transitionCharge', $event)"
       ></t-pay>
       <cash
         v-if="paymethod=='F5EF99BC-0FF0-4CA4-805D-5045E12B90CF'"

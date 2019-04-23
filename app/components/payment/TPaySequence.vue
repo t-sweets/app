@@ -55,7 +55,7 @@ export default {
       this.$emit("reSelect");
     },
     /*
-     ** Start Card Reader
+     ** Step0. Start Card Reader
      */
     async preparePayment() {
       await this.showMessage(["Touch Felica", "Card"]);
@@ -89,7 +89,7 @@ export default {
     },
 
     /**
-     * API Tokenなどの発行
+     * Step1. API Tokenなどの発行
      */
     async connectApi() {
       this.isPause = true;
@@ -105,8 +105,11 @@ export default {
         if (response == true) {
           this.recognization();
         } else {
+          this.setStatus("pending");
           this.playSE("error");
           this.emissionLED("error");
+
+          this.loading.close();
           let message = "T-Payサーバーとの通信の際に不明なエラーが発生しました";
           switch (response) {
             case "Insufficient funds":
@@ -114,7 +117,19 @@ export default {
                 "Balance is under",
                 "the payment price."
               ]);
-              message = "残高不足です。チャージしてください";
+              // チャージ画面へ遷移させる為に特別実装
+              this.$ons.notification.confirm({
+                title: "残高不足",
+                messageHTML: "残高が不足しています。チャージしてください",
+                buttonLabels: ["支払い方法変更", "チャージをする"],
+                callback: index => {
+                  if (index === 0) this.reSelect();
+                  else if (index === 1) {
+                    this.$emit("transitionCharge");
+                  }
+                }
+              });
+              return false;
               break;
             case "User auth failed":
               await this.showMessage(["This card is not", "registerd."]);
@@ -125,13 +140,17 @@ export default {
                 "お使いのアカウントはこの店舗で決済を行うことができません";
               break;
           }
-          this.isReading = false;
-          this.loading.close();
-          this.$ons.notification.alert(message);
+          this.$ons.notification.alert({
+            title: "エラー",
+            message: message
+          });
         }
       }
     },
 
+    /**
+     * Step2. カードを認識した後のメソッド
+     */
     async recognization() {
       if (
         await this.purchaseCreate({
@@ -148,6 +167,9 @@ export default {
       }
     },
 
+    /**
+     * Step3. 完了画面へ推移する前準備。
+     */
     async prepareSuccess() {
       //レシート情報を格納
       const params = {
