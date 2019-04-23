@@ -22,7 +22,7 @@
     <div class="footer">
       <el-button type="primary" :disabled="withdraw.price <= 0" @click="confirmWithdraw">出金する</el-button>
     </div>
-    <calc-popover :popover="popover" :total="withdraw.price" @confirm="inputPrice"/>
+    <calc-popover :popover="popover" :total="withdraw.price" prefix="¥" @confirm="inputPrice"/>
   </v-ons-page>
 </template>
 
@@ -56,7 +56,7 @@ export default {
           zIndex: 9999
         }
       ).then(async () => {
-        const response = await this.execWithdraw({
+        const response = await this.setWithdraw({
           amount: this.withdraw.price,
           detail: this.withdraw.detail
         });
@@ -81,7 +81,7 @@ export default {
       this.withdraw.price = num;
       this.popover.visible = false;
     },
-    ...mapActions("pos/admin/liquidation-manager", { execWithdraw: "withdraw" })
+    ...mapActions("pos/admin/liquidation-manager", ["setWithdraw"])
   },
   computed: {
     ...mapState("pos/admin", ["user"])

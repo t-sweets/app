@@ -6,6 +6,7 @@
       @dialog-push-page="pageStack.push($event)"
       @dialog-pop-page="popPage($event)"
       @dialog-hide="dialogVisible = false"
+      @push-base-page="pushBasePage($event)"
     ></v-ons-navigator>
   </v-ons-dialog>
 </template>
@@ -27,6 +28,9 @@ export default {
     popPage(event) {
       if (event) this.pageStack.unshift(event);
       this.pageStack.splice(1, this.pageStack.length - 1);
+    },
+    pushBasePage(event) {
+      this.$emit("push-page", event);
     }
   }
 };

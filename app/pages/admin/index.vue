@@ -28,7 +28,7 @@
     </el-row>
 
     <edit-user-modal :isSelf="true" ref="myDataEdit" @logout="execLogout()"/>
-    <liquidation ref="inspectMenuModal"/>
+    <liquidation ref="inspectMenuModal" @push-page="$emit('push-page',$event)"/>
   </v-ons-page>
 </template>
 

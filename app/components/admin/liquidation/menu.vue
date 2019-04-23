@@ -18,6 +18,7 @@
 
 <script>
 import withdrawal from "@/components/admin/liquidation/withdrawal";
+import registerCheck from "@/pages/admin/liquidation/registerCheck";
 
 export default {
   data() {
@@ -31,12 +32,16 @@ export default {
         },
         {
           title: "レジチェック",
-          onClick: () => {}
+          onClick: () => {
+            this.$emit("dialog-hide");
+            this.$emit("push-base-page", registerCheck);
+          }
         },
-
         {
           title: "レジチェック履歴",
-          onClick: () => {}
+          onClick: () => {
+            this.$emit("dialog-push-page", registerCheck);
+          }
         }
       ]
     };
