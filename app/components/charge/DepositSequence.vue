@@ -1,46 +1,62 @@
 <template>
-  <div class="calc">
-    <div class="title">
-      <div class="title">入金額</div>
-      <div class="total">{{ total }}</div>
-    </div>
-    <div class="change">
-      <div class="title">おつり</div>
-      <div class="change">¥{{ total - amount }}</div>
-    </div>
-    <div class="calc-buttons">
-      <div class="calc-button" v-for="num in calcButtons" :key="num">
-        <el-button @click="calcButton(num)" :plain="num == 'AC' ? true : false">{{ num }}</el-button>
+  <div class="base">
+    <div class="calc">
+      <v-ons-list modifier="inset">
+        <v-ons-list-item tappable>
+          <div class="center">入金額</div>
+          <div class="right">
+            <el-input size="large" v-model="total" @focus="showPopover($event)">
+              <template slot="prepend">¥</template>
+            </el-input>
+          </div>
+        </v-ons-list-item>
+        <v-ons-list-item>
+          <div class="center">釣り銭</div>
+          <div class="right">{{ `¥${total - amount}` }}</div>
+        </v-ons-list-item>
+      </v-ons-list>
+      <el-button @click="$emit('back-amount')" type="text">チャージ額を変更する</el-button>
+      <div class="payment-btns">
+        <el-button
+          type="primary"
+          round
+          :disabled="!paymentable"
+          icon="el-icon-message"
+          @click="$emit('exec-charge')"
+        >チャージをする</el-button>
       </div>
-      <div class="calc-button">
-        <el-button type="primary" @click="calcButton('OK')" :disabled="!paymentable">完了</el-button>
-      </div>
     </div>
-    <el-button @click="$emit('back-amount')" type="text">チャージ額を変更する</el-button>
+    <calc-popover :popover="popover" prefix="¥" :total="total" @confirm="inputPrice"/>
   </div>
 </template>
 
 <script>
+import CalcPopover from "@/components/CalcPopover";
 import { mapState, mapActions } from "vuex";
 export default {
   data() {
     return {
-      total: "0",
-      calcButtons: [1, 2, 3, 4, 5, 6, 7, 8, 9, "AC", 0]
+      total: 0,
+      popover: {
+        visible: false,
+        target: null,
+        direction: "down",
+        coverTarget: false
+      }
     };
   },
   methods: {
     reSelect() {
       this.$emit("reSelect");
     },
-    calcButton(obj) {
-      if (typeof obj === "number") {
-        this.total != "0" ? (this.total += obj) : (this.total = obj.toString());
-      } else if (obj == "AC") {
-        this.total = "0";
-      } else if (obj == "OK") {
-        this.$emit("exec-charge");
-      }
+    showPopover(event, direction, coverTarget = false) {
+      this.popover.target = event;
+      this.popover.coverTarget = coverTarget;
+      this.popover.visible = true;
+    },
+    inputPrice(num) {
+      this.total = num;
+      this.popover.visible = false;
     }
   },
   computed: {
@@ -49,6 +65,7 @@ export default {
     }
   },
   props: ["amount"],
+  components: { CalcPopover },
   created() {
     this.total = this.amount;
   }
@@ -57,47 +74,48 @@ export default {
 
 
 <style lang="scss" scoped>
-.calc {
-  @include pc {
-    width: 100%;
-  }
-  @include tab {
-    height: 80%;
-  }
-  display: inline-block;
+.base {
+  margin: 0 auto;
   text-align: center;
-  margin-bottom: 20px;
-  .title,
-  .change {
-    margin: auto 0;
-    padding: 5px 30px;
-    .title {
-      display: inline-block;
+  .calc {
+    @include pc {
+      width: 100%;
     }
-    .total {
-      display: inline-block;
-      width: 400px;
-      padding: 0px 10px;
-      background-color: rgb(206, 255, 239);
-      border: 1px solid rgb(38, 167, 253);
-      font-size: 35px;
-      text-align: right;
+    @include tab {
+      height: 100%;
     }
-    .change {
-      display: inline-block;
-      text-align: right;
-      width: 400px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
+    .el-input {
+      font-size: 25px;
     }
-  }
-  .calc-buttons {
-    margin: 30px;
-    margin-bottom: 10px;
-    .calc-button {
-      display: inline-block;
-      width: 30%;
-      margin: 5px;
+    button {
+      &.el-button--text {
+        font-size: 16px;
+      }
+    }
+    .payment-btns {
+      width: 80%;
+      margin: 10px auto;
       button {
         width: 100%;
+        font-size: 20px;
+        padding: 20px;
+        border-radius: 100px;
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.base {
+  .calc {
+    .el-input {
+      text-align: right;
+      margin: 10px auto;
+      .el-input__inner {
+        height: 55px;
       }
     }
   }

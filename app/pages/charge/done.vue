@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import successSound from "~/assets/sounds/success.mp3";
 export default {
   data() {
     return {
