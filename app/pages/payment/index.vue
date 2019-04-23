@@ -29,6 +29,7 @@
         @pushSuccess="pushSuccess"
         @showTotal="showTotal"
         @removeCart="removeCart"
+        @transitionCharge="transitionCharge"
       />
     </transition>
     <div class="tabber" :class="{visible: isShowSubtotal}">
@@ -65,6 +66,7 @@ import Products from "~/components/payment/Products.vue";
 import TotalAccount from "~/components/payment/TotalAccount.vue";
 import MenuPage from "~/pages/menu/";
 import DonePage from "~/pages/payment/done";
+import ChargePage from "@/pages/charge/";
 
 const uuidv4 = require("uuid/v4");
 
@@ -223,6 +225,16 @@ export default {
       } else {
         document.onkeydown = () => {};
       }
+    },
+
+    /**
+     * チャージ画面まで自動遷移
+     */
+    transitionCharge() {
+      this.showTotal(false);
+      this.resetCart();
+      this.enableCodeReader(false);
+      this.$emit("pop-page", ChargePage);
     },
 
     ...mapMutations("pos", ["productToHead"]),
