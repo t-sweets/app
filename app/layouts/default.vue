@@ -22,7 +22,7 @@ export default {
   methods: {
     popPage(event) {
       if (event) this.pageStack.splice(this.pageStack.length - 1, 0, event);
-      this.pageStack.splice(this.pageStack.length - 2, 2);
+      this.pageStack.splice(this.pageStack.length - 1, 1);
     },
     resetPosMain() {
       this.pageStack = [start, menu, index];

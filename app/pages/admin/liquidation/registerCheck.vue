@@ -211,12 +211,18 @@ export default {
   },
   components: { CalcPopover },
   async mounted() {
+    const loading = this.$loading();
     if (!(await this.getBalance())) {
+      loading.close();
       this.$notify.error({
         title: "Error",
         message: "想定レジ内金額を取得できませんでした"
       });
+      setTimeout(() => {
+        this.$emit("pop-page");
+      }, 600);
     } else {
+      loading.close();
       this.isEnableRegiCheck = true;
     }
   }

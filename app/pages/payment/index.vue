@@ -208,7 +208,7 @@ export default {
       this.showTotal(false);
       this.resetCart();
       this.enableCodeReader(false);
-      this.$emit("pop-page", MenuPage);
+      this.$emit("pop-page");
     },
 
     enableCodeReader(bool) {

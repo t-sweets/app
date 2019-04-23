@@ -36,13 +36,6 @@ export default {
 };
 </script>
 
-
-<style lang="scss" scoped>
-.inspect-dialog {
-}
-</style>
-
-
 <style lang="scss">
 .inspect-dialog {
   .dialog {
