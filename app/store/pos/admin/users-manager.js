@@ -88,11 +88,11 @@ export const actions = {
             timeout: 3000
         })
         .catch(err => {
-            return false
+            return err.response
         });
 
         if (response.status == 200 && response.data.success) {
-            await commit("updateUser", response.data.product)
+            await commit("updateUser", response.data)
             return true
         } else {
             return false

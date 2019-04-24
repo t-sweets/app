@@ -36,12 +36,6 @@ export default {
             this.$emit("dialog-hide");
             this.$emit("push-base-page", registerCheck);
           }
-        },
-        {
-          title: "レジチェック履歴",
-          onClick: () => {
-            this.$emit("dialog-push-page", registerCheck);
-          }
         }
       ]
     };
