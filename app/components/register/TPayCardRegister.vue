@@ -116,6 +116,7 @@ export default {
     reSelect() {
       clearTimeout(this.timeout);
       this.resetData();
+      this.isPause = false;
       this.reading = true;
       this.qrURL = "";
       this.prepareRegister();
@@ -130,7 +131,7 @@ export default {
      */
     reloadTimeout() {
       this.timeout = setTimeout(() => {
-        this.$emit("resetPosMain");
+        this.$emit("registerDone");
       }, 20000);
     },
     /**
@@ -138,7 +139,7 @@ export default {
      */
     forceReload() {
       clearTimeout(this.timeout);
-      this.$emit("resetPosMain");
+      this.$emit("registerDone");
     },
 
     ...mapMutations("t-pay/card-reader", ["setStatus"]),
