@@ -95,13 +95,14 @@ export default {
             return true;
           }
         });
-      } else
+      } else {
+        console.log(product);
+
         this.setProduct({
-          id: product.id,
-          name: product.name,
-          quantity: 1,
-          price: product.price
+          ...product,
+          quantity: 1
         });
+      }
     },
 
     /**

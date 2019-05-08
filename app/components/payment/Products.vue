@@ -32,7 +32,8 @@ export default {
         id: id,
         name: this.product.name,
         quantity: this.quantity,
-        price: this.product.price
+        price: this.product.price,
+        cost: this.product.cost
       });
     },
     addCart(product) {
