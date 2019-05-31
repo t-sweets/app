@@ -29,19 +29,36 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    'element-ui/lib/theme-chalk/index.css'
   ],
 
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/element-ui',
+    '~/plugins/sweet-modal',
+    '~/plugins/vue-qriously',
+    '~/plugins/myFunctions',
+    { src: "~/plugins/vuex-persistedstate.js", ssr: false }
   ],
 
   /*
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
+    ['@nuxtjs/dotenv',{ filename: '.env.production' }],
+    'nuxt-onsenui-module',
+    '@nuxtjs/style-resources',
+    'nuxt-fontawesome'
   ],
+
+  styleResources: {
+    scss: [
+      '@/assets/sass/foundation/mixin/_index.scss'
+    ]
+  },
 
   router: {
     mode: 'hash'
@@ -49,16 +66,50 @@ module.exports = {
 
   dev: process.env.NODE_ENV === 'development',
 
+
+  fontawesome: {
+    imports: [
+      {
+        set: '@fortawesome/free-solid-svg-icons',
+        icons: ['fas']
+      }
+    ]
+  },
+
   /*
   ** Build configuration
   */
   build: {
+    vendor: [
+      'element-ui',
+    ],
     /*
     ** You can extend webpack config here
     */
     extend(config, ctx) {
+      vendor: [
+        'vuex',
+      ]
+
+      /*
+      ** Import Audio Files
+      */
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        use: 'file-loader',
+        exclude: /(node_modules)/
+      });
+
+      /*
+       ** Build electron 
+       */
       config.output.publicPath = './_nuxt/'
-      config.target = 'electron-renderer'
+      if (process.env.NODE_ENV == 'development') {
+        config.target = 'electron-renderer'
+      }
     }
-  }
+  },
+  server: {
+    port: 13000, // デフォルト: 3000
+  },
 }

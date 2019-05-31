@@ -1,66 +1,52 @@
 <template>
-  <section class="container">
-    <div>
-      <logo/>
-      <h1 class="title">
-        nuxt-electron-sandbox
-      </h1>
-      <h2 class="subtitle">
-        My stylish Nuxt.js project
-      </h2>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green">Documentation</a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey">GitHub</a>
+  <v-ons-page>
+    <v-ons-toolbar>
+      <div class="center">管理者画面</div>
+      <div class="right">
+        <el-button @click="logout" type="danger" size="small" plain>Logout</el-button>
       </div>
-    </div>
-  </section>
+    </v-ons-toolbar>
+
+    <el-row>
+      <el-col :span="10" v-for="menu in menus" :key="menu.id" :offset="0">
+        <nuxt-link :to="menu.link">
+          <menu-button ref="prod" :menu="menu"/>
+        </nuxt-link>
+      </el-col>
+    </el-row>
+  </v-ons-page>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+import MenuButton from "~/components/startup/MenuButton.vue";
 
 export default {
-  components: {
-    Logo
-  }
-}
+  data() {
+    return {
+      menus: [
+        {
+          title: "販売画面",
+          img: "",
+          link: "/"
+        }
+      ]
+    };
+  },
+  methods: {
+    logout({ redirect }) {
+      Cookie.remove("auth");
+      this.$store.commit("update", null);
+      document.location = "/";
+      // this.$router.push("/");
+    }
+  },
+  components: { MenuButton }
+};
 </script>
 
-<style>
-
-.container {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+<style lang="scss" scoped>
+el-button {
+  margin: 5px;
 }
 </style>
+

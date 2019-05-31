@@ -1,13 +1,41 @@
 <template>
-  <div>
-    <nuxt/>
-  </div>
+  <v-ons-navigator
+    swipeable
+    :page-stack="pageStack"
+    @push-page="pageStack.push($event)"
+    @pop-page="popPage($event)"
+    @resetPosMain="resetPosMain()"
+  ></v-ons-navigator>
 </template>
 
-<style>
+<script>
+import start from "~/pages/startup/";
+import menu from "@/pages/menu/";
+import index from "~/pages/payment/";
+export default {
+  // middleware: ["authenticated"],
+  data() {
+    return {
+      pageStack: [start]
+    };
+  },
+  methods: {
+    popPage(event) {
+      if (event) this.pageStack.splice(this.pageStack.length - 1, 0, event);
+      this.pageStack.splice(this.pageStack.length - 1, 1);
+    },
+    resetPosMain() {
+      this.pageStack = [start, menu, index];
+    }
+  }
+};
+</script>
+
+
+<style lang="scss">
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
@@ -24,32 +52,24 @@ html {
   margin: 0;
 }
 
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
+ons-page {
+  text-align: center;
+}
+.toolbar {
+  .toolbar__title {
+    color: #4b9ad8;
+  }
 }
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
+.dialog-container {
+  -webkit-mask-image: none !important;
 }
 
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
+.el-message-box__wrapper {
+  z-index: 20010 !important;
 }
 
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
+.v-modal {
+  z-index: 20005 !important;
 }
 </style>

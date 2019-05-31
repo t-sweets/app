@@ -1,3 +1,5 @@
+require('dotenv').config({ path: __dirname + '/../app/.env.production' })
+
 /*
 **  Nuxt
 */
@@ -33,9 +35,30 @@ if (config.dev) {
 let win = null // Current window
 const electron = require('electron')
 const app = electron.app
+const globalShortcut = electron.globalShortcut
+const {appUpdater} = require('./src/autoupdater');
+const os = require('os')
 const newWin = () => {
-    win = new electron.BrowserWindow({})
+    const window_config = {
+        kiosk: true,
+        fullscreen: true,
+        frame: false
+    }
+    win = new electron.BrowserWindow(window_config)
+
     win.maximize()
+
+    // Developer Tools
+    // win.openDevTools();
+
+    const ret = globalShortcut.register('Control+Q', () => {
+        win.close()
+        app.quit()
+    })
+
+    // Update check
+    if (os.platform() == 'win32') appUpdater()
+
     win.on('closed', () => win = null)
     if (config.dev) {
         // Wait for nuxt to build
