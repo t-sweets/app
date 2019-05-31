@@ -1,6 +1,6 @@
 {
   "name": "sweets-front-app",
-  "version": "v1.0.0",
+  "version": "v1.1.0-beta",
   "description": "Sweets front application.",
   "author": "sho",
   "private": true,
@@ -65,6 +65,8 @@
     "electron": "^3.0.10",
     "electron-builder": "^20.40.2",
     "electron-builder-squirrel-windows": "^20.40.0",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "tar": "^4.4.8",
+    "fstream": ">=1.0.12"
   }
 }
