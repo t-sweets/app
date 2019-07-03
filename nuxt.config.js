@@ -68,7 +68,8 @@ module.exports = {
     }],
     'nuxt-onsenui-module',
     '@nuxtjs/style-resources',
-    'nuxt-fontawesome'
+    'nuxt-fontawesome',
+    '@nuxtjs/pwa'
   ],
 
   styleResources: {
