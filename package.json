@@ -64,7 +64,7 @@
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
-    "electron": "^3.0.10",
+    "electron": "^18.3.7",
     "electron-builder": "^20.40.2",
     "electron-builder-squirrel-windows": "^20.40.0",
     "nodemon": "^1.11.0",
